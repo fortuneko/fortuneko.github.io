@@ -429,6 +429,158 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/01/写作环境搭建/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Fortune Ko">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fortune Ko">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/01/写作环境搭建/" itemprop="url">写作环境搭建</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-01T20:30:30+08:00">
+                2018-03-01
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Post modified</span>
+              
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-02T11:14:14+08:00">
+                2018-03-02
+              </time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>#Atom编辑器<br>使用atom作为写作编辑器，按照网上的教程进行安装，安装完成后再安装一些需要用的插件，到菜单 <strong>编辑|preference</strong> 下点开配置界面，然后到 <strong>扩展</strong> 页面可以看到已经安装好的插件，到 <strong>安装</strong> 页面可以根据名称在线安装特定插件。平时常用的插件有如下一些：  </p>
+<h2 id="预览插件"><a href="#预览插件" class="headerlink" title="预览插件"></a>预览插件</h2><p>名为markdown-preview-enchaned，该插件除了可以对markdown语法支持外，还可以很好的支持数学公式，以及流程图，同时可以将文章导出成多种格式的文件。</p>
+<h2 id="图片插件"><a href="#图片插件" class="headerlink" title="图片插件"></a>图片插件</h2><p>使用markdown-img-paste插件，支持将图片粘贴到文章中，内部的操作是将剪贴板中的图像内容拷贝到一个指定位置，然后再插入该图片的链接地址，图片的存放位置可以有：</p>
+<ul>
+<li>本地文件夹<br>会在该文章的文件夹中新建一个名为asset的文件夹，图片被存放到该文件夹中</li>
+<li>网络空间<br>可以将图像上传到网络空间（通常称为图床），然后再引用网络空间中的图像，这样以后发布文章的时候就不需要再发布图像了，因为图像已经处于网络上可以被任意访问了</li>
+</ul>
+<p>通常情况下，最好同时勾选本地文件夹和一个网络空间，假如图床挂了，还可以方便的再从本地文件夹中找回图像（本地的图像也上传到github管理）</p>
+<h3 id="七牛云图床使用"><a href="#七牛云图床使用" class="headerlink" title="七牛云图床使用"></a>七牛云图床使用</h3><p>按网站要求完成各种验证，验证完之后到对象存储栏目创建一个存储仓库（bucket），然后在到markdown-img-paste插件配置面板进行如下配置：</p>
+<ul>
+<li>勾选use qiniu for image link</li>
+<li>配置公钥和私钥<br>公钥和私钥在七牛云的个人面板-&gt;秘钥管理里面找到</li>
+<li>bucket名称写前面创建的存储仓库名称</li>
+<li>domain填写上传图像后公共链接除图像名称的前半部分<br>例如假如上传的图像的公共链接是<a href="http://xxxx/image1.png，那么这里domain的内容则是http://xxxx" target="_blank" rel="noopener">http://xxxx/image1.png，那么这里domain的内容则是http://xxxx</a></li>
+<li>Uphost<br>填写图像的上传地址，使用默认值时会出错，错误消息里会提示应该使用的地址，当前使用的是<a href="http://up-z2.qiniu.com" target="_blank" rel="noopener">http://up-z2.qiniu.com</a></li>
+</ul>
+<h1 id="截图软件"><a href="#截图软件" class="headerlink" title="截图软件"></a>截图软件</h1><p>linux中的截图软件可以使用deepin-scrot，安装完成后到 system-&gt;keyboard-&gt;shortcut添加一个快捷键CTRL+ALT+W，内容是deepin-scrot，这样就可以使用快捷键CTRL+ALT+W来启动截图工具了</p>
+<h1 id="工作流"><a href="#工作流" class="headerlink" title="工作流"></a>工作流</h1><p>当前的工作目录如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── fortuneko.github.io</span><br><span class="line">└── hexo</span><br><span class="line">    ├── node_modules  </span><br><span class="line">    ├── public</span><br><span class="line">    ├── scaffolds</span><br><span class="line">    ├── source</span><br><span class="line">    │   ├── _drafts</span><br><span class="line">    │   └── _posts</span><br><span class="line">    └── themes</span><br><span class="line">        ├── landscape</span><br><span class="line">        └── next</span><br></pre></td></tr></table></figure></p>
+<p>fortuneko.github.io为博客的发布仓库文件夹，hexo为博客系统文件夹，其中source文件夹存放写作的文章。写作过程中使用Atom添加hexo/source为项目文件夹，先写草稿将其存放在_drafts中，写好之后直接将其拖到_posts文件夹中，然后再执行一次编译发布。</p>
+<h1 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h1><p>完成上述的环境配置后基本可以开始写作了，后面有时间需要进一步完善的有：<br><strong>图像压缩</strong><br>图片插件在粘贴的时候默认将剪贴板中的截图内容存成png格式，使用图床的话比较浪费流量（七牛云免费每个月只有1G），所以假如可以将截图的内容存成jpg格式的话，可以节省不少流量</p>
+<p><strong>主题优化</strong><br>当期的主题没有类别栏目，没有大纲视图，在主页把所有文章都展开出来，阅读体验比较差</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/01/cmake基础/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1127,7 +1279,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-count">6</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>
