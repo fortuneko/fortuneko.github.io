@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="cmake," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="cmake通过组织某些特定的源文件构建不同的编译目标（编译目标可以是库、可执行文件），同时某些编译目标可以依赖于其他的一些编译目标输出，最后所有的编译目标一起构建成一个工程。使用cmake完成的工程构建后，cmake会为工程生成对应的makefile文件，后面直接基于生成的makefile文件调用make就可以了。构建cmake工程的过程主要是为不同的编译目标编写编写好CMakeLists.txt">
+<meta name="keywords" content="cmake">
+<meta property="og:type" content="article">
+<meta property="og:title" content="cmake基础">
+<meta property="og:url" content="http://yoursite.com/2018/03/01/cmake基础/index.html">
+<meta property="og:site_name" content="Fortune Ko">
+<meta property="og:description" content="cmake通过组织某些特定的源文件构建不同的编译目标（编译目标可以是库、可执行文件），同时某些编译目标可以依赖于其他的一些编译目标输出，最后所有的编译目标一起构建成一个工程。使用cmake完成的工程构建后，cmake会为工程生成对应的makefile文件，后面直接基于生成的makefile文件调用make就可以了。构建cmake工程的过程主要是为不同的编译目标编写编写好CMakeLists.txt">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-03-01T02:44:11.065Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="cmake基础">
+<meta name="twitter:description" content="cmake通过组织某些特定的源文件构建不同的编译目标（编译目标可以是库、可执行文件），同时某些编译目标可以依赖于其他的一些编译目标输出，最后所有的编译目标一起构建成一个工程。使用cmake完成的工程构建后，cmake会为工程生成对应的makefile文件，后面直接基于生成的makefile文件调用make就可以了。构建cmake工程的过程主要是为不同的编译目标编写编写好CMakeLists.txt">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/03/01/cmake基础/"/>
+
+
+
+
+
+  <title>cmake基础 | Fortune Ko</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Fortune Ko</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">grow grow up to get internal peace</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/01/cmake基础/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Fortune Ko">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fortune Ko">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">cmake基础</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-01T10:43:48+08:00">
+                2018-03-01
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Post modified</span>
+              
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-01T10:44:11+08:00">
+                2018-03-01
+              </time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>cmake通过组织某些特定的源文件构建不同的编译目标（编译目标可以是库、可执行文件），同时某些编译目标可以依赖于其他的一些编译目标输出，最后所有的编译目标一起构建成一个工程。使用cmake完成的工程构建后，cmake会为工程生成对应的makefile文件，后面直接基于生成的makefile文件调用make就可以了。<br>构建cmake工程的过程主要是为不同的编译目标编写编写好CMakeLists.txt，然后最后使用一个工程对应编写的CMakeLists.txt将所有的子编译目标组织起来。简单的cmake工程可以不设置子编译目标。</p>
+<p>一个简单的工作流程：<br>1）创建项目目录，准备好代码<br>2）编写好CMakeLists.txt文件<br>2）mkdir build, cd build, cmake ..，自动生成编译所需的文件，包括CmakeFiles,CmakeCache.txt,cmake_install.cmake,以及makefile。这里cmake后面的参数为编写CMakeLists文件所在的目录，这种编译方式是源代码和编译输出不在同一个目录里，为out of place的编译方式，而假如编译输出和源代码在同一个目录，则成为in place编译方式。<br>3）make，完成编译</p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p>基于cmake有两种不同的编译方式，一种称为in-place编译，另一种为out-of-place编译，前一种是编译的输出与源文件工程目录同处一个目录，而后者则是编译输出与源文件处于不同的目录。</p>
+<p>在源码目录外构建（不是在源码目录里面）一个helloworld工程</p>
+<p>1）mkdir test , cd test<br>2）mkdir src ,cd src , vim main.c<br>3）在src目录里，编写CmakeLists.txt，内容如下：<br>ADD_EXECUTABLE(hello main.c)<br>4）在test目录里，编写CmakeLists.txt，内容如下：<br>    PROJECT(HELLO)<br>ADD_SUBDIRECTORY(src bin)<br>5）mkdir build, cd build,cmake .. ,make</p>
+<p>这里面，ADD_EXECUTABLE是用来创建一个项目的，这里创建的是可执行项目，再后面新建了一个HELLO的工程，在该工程中添加了上面创建的项目所在的目录，并将该项目输出目录指定为bin。到此，在build/bin目录里生成了hello可执行文件</p>
+<h2 id="语法规则"><a href="#语法规则" class="headerlink" title="语法规则"></a>语法规则</h2><p>cmake里的指令和函数都不区分大小写，但是变量名区分大小写</p>
+<h3 id="常规变量引用"><a href="#常规变量引用" class="headerlink" title="常规变量引用"></a>常规变量引用</h3><p>使用\${变量名}对变量进行引用，但是如下几个场合直接使用变量名：  </p>
+<ul>
+<li>IF控制语句中</li>
+<li>用SET初始化变量的时候</li>
+</ul>
+<p>示例：MESSAGE(STATUS “This is BINARY dir “ \${PROJECT_BINARY_DIR})<br>说明：变量引用也可以放在字符串中，如上面也可以写成MESSAGE(STATUS “This is BINARY dir ${PROJECT_BINARY_DIR}”)</p>
+<h3 id="环境变量引用"><a href="#环境变量引用" class="headerlink" title="环境变量引用"></a>环境变量引用</h3><p>对于系统的环境变量，可以使用\$ENV{环境变量名}的格式进行引用，例如linux下引用用户根目录使用$ENV{HOME}</p>
+<h3 id="指令调用"><a href="#指令调用" class="headerlink" title="指令调用"></a>指令调用</h3><p>语法：指令（参数1 参数2 ….） 或者 指令（参数1;参数2 ;….）<br>说明：参数之间用 <strong>空格或者分号</strong> 隔开<br>指令的参数中，有一些是用中括号[]包含的，它指明该参数是可选的</p>
+<h2 id="cmake基本指令"><a href="#cmake基本指令" class="headerlink" title="cmake基本指令"></a>cmake基本指令</h2><p>cmake中包含了一系列的指令，编写CMakeLists.txt的过程就是用这些指令来完成某些特定的任务。cmake指令不区分大小写</p>
+<h3 id="PROJECT"><a href="#PROJECT" class="headerlink" title="PROJECT"></a>PROJECT</h3><p>语法：PROJECT(projectname [CXX] [C] [Java])<br>说明：用该指令来定义工程名，并可指定该工程支持的语言，不指定支持语言列表时，表示支持所有语言<br>注：</p>
+<blockquote>
+<p>该指令隐式定义了两个cmake变量，\<projectname>_BINARY_DIR 和 \<projectname>_SOURCE_DIR，在上面示例中，对应的两个变量是HELLO_BINARY_DIR和HELLO_SOURCE_DIR。同时，cmake中也预定义了PROJECT_BINARY_DIR和PROJECT_SOURCE_DIR变量，它们的值与PROJECT隐式定义的两个变量一致，后面实际应用中推荐使用PROJECT_BINARY_DIR和PROJECT_SOURCE_DIR，因为它们不会受到项目名称改变的影响。而假如将工程名HELLO改为了WORLD，则项目中用到的HELLO_BINARY_DIR就需要手动改为WORLD_BINARY_DIR</projectname></projectname></p>
+</blockquote>
+<h3 id="SET"><a href="#SET" class="headerlink" title="SET"></a>SET</h3><p>语法：SET(VAR [VALUE] [CACHE TYPE DOCSTRING [FORCE]])<br>说明：定义cmake变量<br>示例：上面例子中，SET(SRC_LIST main.c)，VALUE也可以是多个值，SET(SRC_LIST main.c a.c)<br>在指定变量的时候，一般来说，变量的值对应的都是字符串，但是可以不用使用””，如上面的main.c可以写成”main.c”，也可以不用””</p>
+<h3 id="message"><a href="#message" class="headerlink" title="message"></a>message</h3><p>语法：message([SEND_ERROR | STATUS | FATAL_ERROR] “message to display” …)<br>说明：用于在构建工程中输出消息，第一个参数用于指定消息的类型，消息为SEND_ERROR时会弹出窗口，STATUS会在消息前加上符号“-”，FATAL_ERROR为失败消息，输出完消息后cmake构建过程终止。后面的消息可以由多个要输出的消息连接而成，使用 <strong>空格符号</strong> 作为连接符号<br>使用示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">message(STATUS &quot;current fold is:&quot; PROJECT_SOURCE_DIR)</span><br></pre></td></tr></table></figure></p>
+<h3 id="add-executable"><a href="#add-executable" class="headerlink" title="add_executable"></a>add_executable</h3><p>语法：add_executable(<name>  [WIN32] [MACOSX_BUNDLE] [EXCLUDE_FROM_ALL]  source1 [source2 …])<br>说明：输出一个可执行文件，该可执行文件是基于某些源文件编译而来的，源文件由源文件列表指定，即为source1 [source2 …]，该操作相当于创建一个输出可执行文件的项目</name></p>
+<h3 id="add-library"><a href="#add-library" class="headerlink" title="add_library"></a>add_library</h3><p>语法：add_library(<name> [STATIC | SHARED | MODULE]         [EXCLUDE_FROM_ALL] source1 [source2 …])<br>说明：输出一个库文件，第一个参数为库名称，第二个参数指定库的生成方式（未指定的话默认是STATIC），EXCLUDE_FROM_ALL指明将该编译目标从所有编译目标中排除，后面的source指定源文件路径 多个的话通过空格分开</name></p>
+<p><strong>EXCLUDE_FROM_ALL</strong> 的用法<br>有的时候在编译release版本的时候，为了加快编译速度需要把测试相关的编译目标关掉，这个时候就可以为测试相关的编译目标增加EXCLUDE_FROM_ALL修饰符，如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">add_library(cmimpl SHARED $&#123;CMIMPL_SOURCE_FILES&#125;)</span><br><span class="line">add_library(cmjnidrv SHARED $&#123;JNI_SOURCE_FILES&#125;)</span><br><span class="line"># fctest指定了EXCLUDE_FROM_ALL 属性,不会自动编译，只能手动编译</span><br><span class="line">add_executable(fctest EXCLUDE_FROM_ALL FeatureCompareSpeedTest.cpp</span><br></pre></td></tr></table></figure></p>
+<p>此时假如需要编译fctest的话，可以手动进行编译，使用make fctest命令。</p>
+<h3 id="add-subdirectory"><a href="#add-subdirectory" class="headerlink" title="add_subdirectory"></a>add_subdirectory</h3><p>语法：add_subdirectory(source_dir [binary_dir] [EXCLUDE_FROM_ALL])<br>说明：从source_dir目录里搜索CMakeLists.txt，将其指定的项目添加到当前工程，同时用binary_dir来指定添加的工程输出中间二进制和目标二进制的存放位置。EXCLUDE_FROM_ALL参数是将该目录从编译过程中排除，例如example目录需要在基本库编译完成后，再进入example目录单独构建</p>
+<h2 id="预定义变量"><a href="#预定义变量" class="headerlink" title="预定义变量"></a>预定义变量</h2><p>cmake中会自带一些预定义变量，这些变量都有默认值，假如熟悉它们的默认值，可以直接使用，否则可以先对这些变量先用SET指定值，然后后面再使用。cmake中自带的一些变量和编译采用的方式有关，有out of place和 in place两种方式，out of place是源代码目录和编译输出目录不在同一个位置，in place则是源代码和编译输出目录在同一个目录</p>
+<h3 id="PROJECT-BINARY-DIR"><a href="#PROJECT-BINARY-DIR" class="headerlink" title="PROJECT_BINARY_DIR"></a>PROJECT_BINARY_DIR</h3><p>编译输出目录，假如是out of place的编译方式，则其对应指定的输出目录，否则就为工程对应的为CMakeLists.txt所在的目录。<br>例如在编译opencv的时候，通常是mkdir build,cd build,cmake ..，这里PROJECT_BINARY_DIR对应的就是build文件夹</p>
+<h3 id="PROJECT-SOURCE-DIR"><a href="#PROJECT-SOURCE-DIR" class="headerlink" title="PROJECT_SOURCE_DIR"></a>PROJECT_SOURCE_DIR</h3><p>为工程对应的为CMakeLists.txt所在的目录</p>
+<h3 id="CMAKE-MODULE-PATH"><a href="#CMAKE-MODULE-PATH" class="headerlink" title="CMAKE_MODULE_PATH"></a>CMAKE_MODULE_PATH</h3><p>CMAKE模块所在的路径，假如工程中编写了.cmake文件，为了让cmake编译系统找到这些文件就需要指定这些文件所在的路径，例如<br>SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)，然后就可以通过INCLUDE来调用.cmake文件中定义的函数了</p>
+<h2 id="编译选项"><a href="#编译选项" class="headerlink" title="编译选项"></a>编译选项</h2><p>CMAKE_CXX_FLAGS和CMAKE_C_FLAGS，分别为c++和c编译选项，通过设置它们量内容可以为工程增加一些编译选项，例如增加c++11支持的话可以使用如下操作<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SET(CMAKE_CXX_FLAGS &quot;$&#123;CMAKE_CXX_FLAGS&#125; -g -std=c++11&quot;)</span><br></pre></td></tr></table></figure></p>
+<p>这里是对原来的编译选项增加新的选项，所以SET对应的值是原来的变量后面再连接新增的值</p>
+<h2 id="构建工程"><a href="#构建工程" class="headerlink" title="构建工程"></a>构建工程</h2><p>构建工程可以有不同的构建方式，这里暂且将它们分为有编译子目标和无编译子目标两种构建方式。  </p>
+<ul>
+<li>有编译子目标<br>将不同部分拆分成不同的子编译目标，最后使用一个CMakeLists.txt将这些子编译目标组织起来，这种构建方式需要为每个子编译目标都编写一个CMakeLists.txt，这种方式属于业界标准的构建方式，像opencv、caffe等一些比较优秀的项目都使用这种构建方式</li>
+<li>无编译子目标<br>这种构建方式通常用于代码量小的工程，整个工程仅有一个编写CMakeLists.txt文件，所有的cmake实现都写在该文件中</li>
+</ul>
+<p>构建cmake工程有一定基本的样式，下面是一个简单的示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">project(testProj)</span><br><span class="line">cmake_minimum_required(VERSION 2.8)</span><br><span class="line"></span><br><span class="line">set(CMAKE_CXX_FLAGS &quot;$&#123;CMAKE_CXX_FLAGS&#125; -g -std=c++11 -fPIC&quot;)</span><br><span class="line">set(CMAKE_C_FLAGS &quot;$&#123;CMAKE_C_FLAGS&#125; -Wall -std=gnu99 -Wno-unknown-pragmas -g -fpermissive&quot;)</span><br><span class="line">aux_source_directory($&#123;PROJECT_SOURCE_DIR&#125;/src LOCAL_SRC_LIST)</span><br><span class="line">include_directories($&#123;PROJECT_SOURCE_DIR&#125;)</span><br><span class="line"></span><br><span class="line">find_package(OpenCV 3.3 REQUIRED)</span><br><span class="line">include_directories($&#123;OpenCV_INCLUDE_DIRS&#125;)</span><br><span class="line"></span><br><span class="line">add_executable(test $&#123;LOCAL_SRC_LIST&#125;)</span><br><span class="line">target_link_libraries(test $&#123;OpenCV_LIBS&#125; )</span><br></pre></td></tr></table></figure></p>
+<p>这里的示例没有构建子编译目标，而是直接构建了一个可执行文件工程。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/cmake/" rel="tag"># cmake</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/01/git基础/" rel="next" title="git基础">
+                <i class="fa fa-chevron-left"></i> git基础
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/02/caffe使用示例/" rel="prev" title="caffe使用示例">
+                caffe使用示例 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Fortune Ko" />
+          <p class="site-author-name" itemprop="name">Fortune Ko</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">tags</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#示例"><span class="nav-number">1.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#语法规则"><span class="nav-number">2.</span> <span class="nav-text">语法规则</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#常规变量引用"><span class="nav-number">2.1.</span> <span class="nav-text">常规变量引用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#环境变量引用"><span class="nav-number">2.2.</span> <span class="nav-text">环境变量引用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#指令调用"><span class="nav-number">2.3.</span> <span class="nav-text">指令调用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cmake基本指令"><span class="nav-number">3.</span> <span class="nav-text">cmake基本指令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PROJECT"><span class="nav-number">3.1.</span> <span class="nav-text">PROJECT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SET"><span class="nav-number">3.2.</span> <span class="nav-text">SET</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#message"><span class="nav-number">3.3.</span> <span class="nav-text">message</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#add-executable"><span class="nav-number">3.4.</span> <span class="nav-text">add_executable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#add-library"><span class="nav-number">3.5.</span> <span class="nav-text">add_library</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#add-subdirectory"><span class="nav-number">3.6.</span> <span class="nav-text">add_subdirectory</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#预定义变量"><span class="nav-number">4.</span> <span class="nav-text">预定义变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PROJECT-BINARY-DIR"><span class="nav-number">4.1.</span> <span class="nav-text">PROJECT_BINARY_DIR</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PROJECT-SOURCE-DIR"><span class="nav-number">4.2.</span> <span class="nav-text">PROJECT_SOURCE_DIR</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CMAKE-MODULE-PATH"><span class="nav-number">4.3.</span> <span class="nav-text">CMAKE_MODULE_PATH</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译选项"><span class="nav-number">5.</span> <span class="nav-text">编译选项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#构建工程"><span class="nav-number">6.</span> <span class="nav-text">构建工程</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Fortune Ko</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

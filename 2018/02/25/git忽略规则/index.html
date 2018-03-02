@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="git," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="git中使用.gitignore文件来指定要忽略的文件，.gitignore文件中每一有效行都指定了一种模式，符合该模式的文件或目录会被git忽略。 假如当前git仓库的文件结构如下：123456789.├── fold_a│   └── file_a.md├── fold_b│   ├── file_b.md│   └── fold_a│       └── file_b_a.md└── fol">
+<meta name="keywords" content="git">
+<meta property="og:type" content="article">
+<meta property="og:title" content="git忽略规则">
+<meta property="og:url" content="http://yoursite.com/2018/02/25/git忽略规则/index.html">
+<meta property="og:site_name" content="Fortune Ko">
+<meta property="og:description" content="git中使用.gitignore文件来指定要忽略的文件，.gitignore文件中每一有效行都指定了一种模式，符合该模式的文件或目录会被git忽略。 假如当前git仓库的文件结构如下：123456789.├── fold_a│   └── file_a.md├── fold_b│   ├── file_b.md│   └── fold_a│       └── file_b_a.md└── fol">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-02-25T09:19:39.128Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="git忽略规则">
+<meta name="twitter:description" content="git中使用.gitignore文件来指定要忽略的文件，.gitignore文件中每一有效行都指定了一种模式，符合该模式的文件或目录会被git忽略。 假如当前git仓库的文件结构如下：123456789.├── fold_a│   └── file_a.md├── fold_b│   ├── file_b.md│   └── fold_a│       └── file_b_a.md└── fol">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/02/25/git忽略规则/"/>
+
+
+
+
+
+  <title>git忽略规则 | Fortune Ko</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Fortune Ko</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">grow grow up to get internal peace</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/25/git忽略规则/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Fortune Ko">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fortune Ko">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">git忽略规则</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-25T17:18:46+08:00">
+                2018-02-25
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Post modified</span>
+              
+              <time title="Post modified" itemprop="dateModified" datetime="2018-02-25T17:19:39+08:00">
+                2018-02-25
+              </time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>git中使用.gitignore文件来指定要忽略的文件，.gitignore文件中每一有效行都指定了一种模式，符合该模式的文件或目录会被git忽略。</p>
+<p>假如当前git仓库的文件结构如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── fold_a</span><br><span class="line">│   └── file_a.md</span><br><span class="line">├── fold_b</span><br><span class="line">│   ├── file_b.md</span><br><span class="line">│   └── fold_a</span><br><span class="line">│       └── file_b_a.md</span><br><span class="line">└── fold_c</span><br><span class="line">    └── fold_a #文件</span><br></pre></td></tr></table></figure></p>
+<p>这里以如上的文件结构为示例来说明git的忽略规则</p>
+<h3 id="无效规则"><a href="#无效规则" class="headerlink" title="无效规则"></a>无效规则</h3><p>.gitignore文件中的某些字符不会被git解析为忽略规则：</p>
+<ul>
+<li>空行</li>
+<li>#开头的行（#开头的表示为注释）</li>
+<li>某行后面的空格会被忽略</li>
+</ul>
+<h3 id="忽略目录"><a href="#忽略目录" class="headerlink" title="忽略目录"></a>忽略目录</h3><p>在忽略模式中含有斜杠/，仅仅忽略符合指定规则的目录，而不会忽略同名的文件，假如该例中.gitignore内容写为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fold_a/</span><br></pre></td></tr></table></figure></p>
+<p>此时git reset;git add .;git status的输出为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">new file:   .gitignore</span><br><span class="line">new file:   fold_b/file_b.md</span><br><span class="line">new file:   fold_c/fold_a</span><br></pre></td></tr></table></figure></p>
+<p>可以看出fold_b/fold_a目录及其以下的文件也被忽略</p>
+<h3 id="通配符忽略模式"><a href="#通配符忽略模式" class="headerlink" title="通配符忽略模式"></a>通配符忽略模式</h3><p>假如忽略模式中不含有斜杠，则对应的忽略模式被认为是一个shell通配符，git会根据该通配符来匹配.gitignore文件所在目录以下所有的文件和目录，假如该例中.gitignore内容写为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fold_a</span><br></pre></td></tr></table></figure></p>
+<p>此时git reset;git add .;git status的输出为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">new file:   .gitignore</span><br><span class="line">new file:   fold_b/file_b.md</span><br></pre></td></tr></table></figure></p>
+<p>可以看出名为fold_a的文件和目录都被忽略。</p>
+<h4 id="shell通配符"><a href="#shell通配符" class="headerlink" title="shell通配符"></a>shell通配符</h4><p>官方叫法为shell glob，可以认为是一种简化的正则表达式，它的语法规则如下：</p>
+<ul>
+<li>星号（*）：匹配零个或任意多个字符</li>
+<li>问号（？）：匹配任意一个字符</li>
+<li>[abc]：匹配方括号中的任意一个字符</li>
+<li>[a-z]：短划线表示字符的范围，这里表示匹配a到z中的任意一个字符</li>
+<li>[!] :匹配方括号内字符以外的任意字符，例如[!A]表示匹配除A以外的任意一个字符</li>
+</ul>
+<h3 id="取消或略特定文件"><a href="#取消或略特定文件" class="headerlink" title="取消或略特定文件"></a>取消或略特定文件</h3><p>假如 <strong>前面的</strong> 规则忽略了某些特定的文件，但是又想将其中的某个文件加入git跟踪，可以使用惊叹号！写一条取消忽略的规则，假如该例中.gitignore内容写为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">*.md</span><br><span class="line">!file_b_a.md</span><br></pre></td></tr></table></figure></p>
+<p>此时git reset;git add .;git status的输出为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">new file:   .gitignore</span><br><span class="line">new file:   fold_b/fold_a/file_b_a.md</span><br><span class="line">new file:   fold_c/fold_a</span><br></pre></td></tr></table></figure></p>
+<p>上述的两条规则中第一条将所有的md文件忽略，第二条规则将名为file_b_a.md的文件取消忽略。但是假如取消忽略的文件所在的目录被忽略了，取消忽略该文件的规则就不会生效，假如该例中.gitignore内容更改为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">*.md</span><br><span class="line">fold_a/</span><br><span class="line">!file_b_a.md</span><br></pre></td></tr></table></figure></p>
+<p>此时git reset;git add .;git status的输出如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">new file:   .gitignore</span><br><span class="line">new file:   fold_c/fold_a</span><br></pre></td></tr></table></figure></p>
+<p>file_b_a.md没有被加入跟踪，因为它所在的文件夹fold_a被忽略了。</p>
+<h3 id="双星号（-）字符"><a href="#双星号（-）字符" class="headerlink" title="双星号（** ）字符"></a>双星号（** ）字符</h3><p>两个星号可以表示任意层级的目录，上面讲到的通配符要来指定目录的时候，通常各级的路径都要自己手动指定，但是要表示多级目录无法做到，而双星号可以很方便的表示多级目录。假如该例中.gitignore内容写为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fold_b/**/*.md</span><br></pre></td></tr></table></figure></p>
+<p>此时git reset;git add .;git status的输出为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">new file:   .gitignore</span><br><span class="line">new file:   fold_b/file_b.md</span><br><span class="line">new file:   fold_c/fold_a</span><br></pre></td></tr></table></figure></p>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>在git中，可以在其他地方也使用shell通配符以及双星号来匹配特定的文件或目录，例如在git add，git reset 等等需要指定文件的命令中</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/git/" rel="tag"># git</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/11/github博客搭建/" rel="next" title="github博客搭建">
+                <i class="fa fa-chevron-left"></i> github博客搭建
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/01/git基础/" rel="prev" title="git基础">
+                git基础 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Fortune Ko" />
+          <p class="site-author-name" itemprop="name">Fortune Ko</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">tags</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#无效规则"><span class="nav-number">1.</span> <span class="nav-text">无效规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#忽略目录"><span class="nav-number">2.</span> <span class="nav-text">忽略目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通配符忽略模式"><span class="nav-number">3.</span> <span class="nav-text">通配符忽略模式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#shell通配符"><span class="nav-number">3.1.</span> <span class="nav-text">shell通配符</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#取消或略特定文件"><span class="nav-number">4.</span> <span class="nav-text">取消或略特定文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#双星号（-）字符"><span class="nav-number">5.</span> <span class="nav-text">双星号（** ）字符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他"><span class="nav-number">6.</span> <span class="nav-text">其他</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Fortune Ko</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
