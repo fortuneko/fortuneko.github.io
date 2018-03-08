@@ -94,18 +94,18 @@
 
 
 
-<meta name="description" content="hexo博客安装配置安装nodejs12sudo apt-get install nodejssudo apt-get install npm 安装完nodejs需要将系统两个位置的文件链接，不然会出现这样的错误”/usr/bin/env: ‘node’: No such file or directory”，链接方式如下1sudo ln -s /usr/bin/nodejs /usr/bin/n">
+<meta name="description" content="hexo博客安装配置安装nodejs12sudo apt-get install nodejssudo apt-get install npm 上面这种直接安装的nodejs版本太老，假如后面安装的hexo版本较高的话，hexo会不能使用，所以安装时不能直接通过ubuntu的包管理来安装，使用如下安装方式：12curl -sL https://deb.nodesource.com/setup_8.">
 <meta name="keywords" content="blog">
 <meta property="og:type" content="article">
 <meta property="og:title" content="github博客搭建">
 <meta property="og:url" content="http://yoursite.com/2018/02/11/github博客搭建/index.html">
 <meta property="og:site_name" content="Fortune Ko">
-<meta property="og:description" content="hexo博客安装配置安装nodejs12sudo apt-get install nodejssudo apt-get install npm 安装完nodejs需要将系统两个位置的文件链接，不然会出现这样的错误”/usr/bin/env: ‘node’: No such file or directory”，链接方式如下1sudo ln -s /usr/bin/nodejs /usr/bin/n">
+<meta property="og:description" content="hexo博客安装配置安装nodejs12sudo apt-get install nodejssudo apt-get install npm 上面这种直接安装的nodejs版本太老，假如后面安装的hexo版本较高的话，hexo会不能使用，所以安装时不能直接通过ubuntu的包管理来安装，使用如下安装方式：12curl -sL https://deb.nodesource.com/setup_8.">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-03-01T02:45:58.790Z">
+<meta property="og:updated_time" content="2018-03-08T09:09:20.686Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="github博客搭建">
-<meta name="twitter:description" content="hexo博客安装配置安装nodejs12sudo apt-get install nodejssudo apt-get install npm 安装完nodejs需要将系统两个位置的文件链接，不然会出现这样的错误”/usr/bin/env: ‘node’: No such file or directory”，链接方式如下1sudo ln -s /usr/bin/nodejs /usr/bin/n">
+<meta name="twitter:description" content="hexo博客安装配置安装nodejs12sudo apt-get install nodejssudo apt-get install npm 上面这种直接安装的nodejs版本太老，假如后面安装的hexo版本较高的话，hexo会不能使用，所以安装时不能直接通过ubuntu的包管理来安装，使用如下安装方式：12curl -sL https://deb.nodesource.com/setup_8.">
 
 
 
@@ -292,7 +292,7 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-11T11:39:27+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-11T11:39:27-05:00">
                 2018-02-11
               </time>
             
@@ -308,8 +308,8 @@
               
                 <span class="post-meta-item-text">Post modified</span>
               
-              <time title="Post modified" itemprop="dateModified" datetime="2018-03-01T10:45:58+08:00">
-                2018-03-01
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-08T04:09:20-05:00">
+                2018-03-08
               </time>
             
           </span>
@@ -343,8 +343,8 @@
 
       
         <h1 id="hexo博客安装配置"><a href="#hexo博客安装配置" class="headerlink" title="hexo博客安装配置"></a>hexo博客安装配置</h1><h2 id="安装nodejs"><a href="#安装nodejs" class="headerlink" title="安装nodejs"></a>安装nodejs</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install nodejs</span><br><span class="line">sudo apt-get install npm</span><br></pre></td></tr></table></figure>
-<p>安装完nodejs需要将系统两个位置的文件链接，不然会出现这样的错误”/usr/bin/env: ‘node’: No such file or directory”，链接方式如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ln -s /usr/bin/nodejs /usr/bin/node</span><br></pre></td></tr></table></figure></p>
-<h2 id="安装hexo"><a href="#安装hexo" class="headerlink" title="安装hexo"></a>安装hexo</h2><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mkdir hexo;cd hexo</span><br><span class="line">npm install hexo-cli -g</span><br><span class="line">hexo init blog</span><br><span class="line">cd blog</span><br><span class="line">npm install</span><br><span class="line">hexo g <span class="comment"># 或者hexo generate</span></span><br><span class="line">$ hexo s <span class="comment"># 或者hexo server，可以在http://localhost:4000/ 查看</span></span><br></pre></td></tr></table></figure>
+<p>上面这种直接安装的nodejs版本太老，假如后面安装的hexo版本较高的话，hexo会不能使用，所以安装时不能直接通过ubuntu的包管理来安装，使用如下安装方式：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -</span><br><span class="line">sudo apt-get install -y nodejs</span><br></pre></td></tr></table></figure></p>
+<h2 id="安装hexo"><a href="#安装hexo" class="headerlink" title="安装hexo"></a>安装hexo</h2><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mkdir hexo;cd hexo</span><br><span class="line">npm install hexo-cli -g</span><br><span class="line">hexo init blog <span class="comment">#初次安装的执行该命令，否则假如是从网上仓库下载下来的话就可以跳过该步骤</span></span><br><span class="line">cd blog</span><br><span class="line">npm install <span class="comment">#会生成node_modules等文件夹</span></span><br><span class="line">hexo g <span class="comment"># 或者hexo generate</span></span><br><span class="line">$ hexo s <span class="comment"># 或者hexo server，可以在http://localhost:4000/ 查看</span></span><br></pre></td></tr></table></figure>
 <h2 id="hexo搭建"><a href="#hexo搭建" class="headerlink" title="hexo搭建"></a>hexo搭建</h2><p>hexo框架是将编写的文档编译生成静态的html文件，然后再将这些静态html文件推送到github，和写程序写完之后进行编译再发布类似。详细的教程参见<a href="https://hexo.io/zh-cn/docs/setup.html" target="_blank" rel="noopener">这里</a></p>
 <h3 id="初始化网站"><a href="#初始化网站" class="headerlink" title="初始化网站"></a>初始化网站</h3><p>使用如下命令命令会在当前文件夹下创建一个blog文件夹，同时在该文件夹中生成建站需要的文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo init blog</span><br><span class="line">cd blog</span><br><span class="line">npm install</span><br></pre></td></tr></table></figure></p>
 <h3 id="hexo文件结构"><a href="#hexo文件结构" class="headerlink" title="hexo文件结构"></a>hexo文件结构</h3><p>完成网站的初始化后，会在blog文件中生成如下文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── _config.yml</span><br><span class="line">├── package.json</span><br><span class="line">├── node_modules</span><br><span class="line">├── scaffolds</span><br><span class="line">|   ├── draft.md</span><br><span class="line">|   └── page.md</span><br><span class="line">|   └── post.md</span><br><span class="line">├── source</span><br><span class="line">|   ├── _drafts</span><br><span class="line">|   └── _posts</span><br><span class="line">└── themes</span><br><span class="line">├── public</span><br></pre></td></tr></table></figure></p>
@@ -483,7 +483,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-count">7</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>
@@ -495,10 +495,10 @@
             
             
             <div class="site-state-item site-state-tags">
-              
+              <a href="/tags/index.html">
                 <span class="site-state-item-count">4</span>
                 <span class="site-state-item-name">tags</span>
-              
+              </a>
             </div>
           
 
@@ -702,6 +702,8 @@
   
 
   
+  
+
 
   
 

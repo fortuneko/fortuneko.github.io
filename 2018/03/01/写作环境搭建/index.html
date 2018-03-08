@@ -102,7 +102,7 @@
 <meta property="og:site_name" content="Fortune Ko">
 <meta property="og:description" content="#Atom编辑器使用atom作为写作编辑器，按照网上的教程进行安装，安装完成后再安装一些需要用的插件，到菜单 编辑|preference 下点开配置界面，然后到 扩展 页面可以看到已经安装好的插件，到 安装 页面可以根据名称在线安装特定插件。平时常用的插件有如下一些：   预览插件名为markdown-preview-enchaned，该插件除了可以对markdown语法支持外，还可以很好的支持数">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-03-02T03:14:14.270Z">
+<meta property="og:updated_time" content="2018-03-08T08:29:57.522Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="写作环境搭建">
 <meta name="twitter:description" content="#Atom编辑器使用atom作为写作编辑器，按照网上的教程进行安装，安装完成后再安装一些需要用的插件，到菜单 编辑|preference 下点开配置界面，然后到 扩展 页面可以看到已经安装好的插件，到 安装 页面可以根据名称在线安装特定插件。平时常用的插件有如下一些：   预览插件名为markdown-preview-enchaned，该插件除了可以对markdown语法支持外，还可以很好的支持数">
@@ -292,7 +292,7 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-01T20:30:30+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-01T20:30:30-05:00">
                 2018-03-01
               </time>
             
@@ -308,8 +308,8 @@
               
                 <span class="post-meta-item-text">Post modified</span>
               
-              <time title="Post modified" itemprop="dateModified" datetime="2018-03-02T11:14:14+08:00">
-                2018-03-02
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-08T03:29:57-05:00">
+                2018-03-08
               </time>
             
           </span>
@@ -343,7 +343,14 @@
 
       
         <p>#Atom编辑器<br>使用atom作为写作编辑器，按照网上的教程进行安装，安装完成后再安装一些需要用的插件，到菜单 <strong>编辑|preference</strong> 下点开配置界面，然后到 <strong>扩展</strong> 页面可以看到已经安装好的插件，到 <strong>安装</strong> 页面可以根据名称在线安装特定插件。平时常用的插件有如下一些：  </p>
-<h2 id="预览插件"><a href="#预览插件" class="headerlink" title="预览插件"></a>预览插件</h2><p>名为markdown-preview-enchaned，该插件除了可以对markdown语法支持外，还可以很好的支持数学公式，以及流程图，同时可以将文章导出成多种格式的文件。</p>
+<h2 id="预览插件"><a href="#预览插件" class="headerlink" title="预览插件"></a>预览插件</h2><p>名为markdown-preview-enchaned，该插件除了可以对markdown语法支持外，还可以很好的支持数学公式，以及流程图，同时可以将文章导出成多种格式的文件。<br>安装插件，需要先安装如下几个软件：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install nodejs-legacy;</span><br><span class="line">sudo apt install npm;</span><br></pre></td></tr></table></figure></p>
+<p>安装完成之后，再对npm进行配置，这项非常重要，不然墙内用户非常可能会出现如下错误：</p>
+<blockquote>
+<p>69802 error network This is most likely not a problem with npm itself<br>69802 error network and is related to network connectivity.</p>
+</blockquote>
+<p>配置操作为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm config set registry http://registry.npm.taobao.org</span><br></pre></td></tr></table></figure></p>
+<p>完成该配置操作后，可以直接到github将markdown-preview-enhanced项目拷贝下来，进行如下操作：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> markdown-preview-enhanced;</span><br><span class="line">npm install;</span><br><span class="line">apm link</span><br></pre></td></tr></table></figure></p>
+<p>再重启atom就可以看到插件已经安装好了</p>
 <h2 id="图片插件"><a href="#图片插件" class="headerlink" title="图片插件"></a>图片插件</h2><p>使用markdown-img-paste插件，支持将图片粘贴到文章中，内部的操作是将剪贴板中的图像内容拷贝到一个指定位置，然后再插入该图片的链接地址，图片的存放位置可以有：</p>
 <ul>
 <li>本地文件夹<br>会在该文章的文件夹中新建一个名为asset的文件夹，图片被存放到该文件夹中</li>
@@ -358,6 +365,10 @@
 <li>domain填写上传图像后公共链接除图像名称的前半部分<br>例如假如上传的图像的公共链接是<a href="http://xxxx/image1.png，那么这里domain的内容则是http://xxxx" target="_blank" rel="noopener">http://xxxx/image1.png，那么这里domain的内容则是http://xxxx</a></li>
 <li>Uphost<br>填写图像的上传地址，使用默认值时会出错，错误消息里会提示应该使用的地址，当前使用的是<a href="http://up-z2.qiniu.com" target="_blank" rel="noopener">http://up-z2.qiniu.com</a></li>
 </ul>
+<h1 id="博客框架"><a href="#博客框架" class="headerlink" title="博客框架"></a>博客框架</h1><p>博客框架选用hexo，主题选用next，next的一些非默认配置如下：<br><strong>开启数学公式支持</strong><br>到themes/next/config.yml中的“# MathJax Support”项，修改如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mathjax:</span><br><span class="line">  enable: true</span><br><span class="line">  per_page: true</span><br></pre></td></tr></table></figure></p>
+<p><strong>开启显示文章修改日期</strong><br>到themes/next/config.yml中的“post_meta”项，修改如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">updated_at: true</span><br></pre></td></tr></table></figure></p>
+<p><strong>开启read more</strong><br>到themes/next/config.yml中的“post_meta”项，修改如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">auto_excerpt:</span><br><span class="line">  enable: true</span><br><span class="line">  length: 150</span><br></pre></td></tr></table></figure></p>
+<p>此时首页中的文章不会全部展示，每篇文章只会显示前150个字</p>
 <h1 id="截图软件"><a href="#截图软件" class="headerlink" title="截图软件"></a>截图软件</h1><p>linux中的截图软件可以使用deepin-scrot，安装完成后到 system-&gt;keyboard-&gt;shortcut添加一个快捷键CTRL+ALT+W，内容是deepin-scrot，这样就可以使用快捷键CTRL+ALT+W来启动截图工具了</p>
 <h1 id="工作流"><a href="#工作流" class="headerlink" title="工作流"></a>工作流</h1><p>当前的工作目录如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── fortuneko.github.io</span><br><span class="line">└── hexo</span><br><span class="line">    ├── node_modules  </span><br><span class="line">    ├── public</span><br><span class="line">    ├── scaffolds</span><br><span class="line">    ├── source</span><br><span class="line">    │   ├── _drafts</span><br><span class="line">    │   └── _posts</span><br><span class="line">    └── themes</span><br><span class="line">        ├── landscape</span><br><span class="line">        └── next</span><br></pre></td></tr></table></figure></p>
 <p>fortuneko.github.io为博客的发布仓库文件夹，hexo为博客系统文件夹，其中source文件夹存放写作的文章。写作过程中使用Atom添加hexo/source为项目文件夹，先写草稿将其存放在_drafts中，写好之后直接将其拖到_posts文件夹中，然后再执行一次编译发布。</p>
@@ -482,7 +493,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-count">7</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>
@@ -494,10 +505,10 @@
             
             
             <div class="site-state-item site-state-tags">
-              
+              <a href="/tags/index.html">
                 <span class="site-state-item-count">4</span>
                 <span class="site-state-item-name">tags</span>
-              
+              </a>
             </div>
           
 
@@ -530,7 +541,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#预览插件"><span class="nav-number">1.</span> <span class="nav-text">预览插件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图片插件"><span class="nav-number">2.</span> <span class="nav-text">图片插件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#七牛云图床使用"><span class="nav-number">2.1.</span> <span class="nav-text">七牛云图床使用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#截图软件"><span class="nav-number"></span> <span class="nav-text">截图软件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#工作流"><span class="nav-number"></span> <span class="nav-text">工作流</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#TODO"><span class="nav-number"></span> <span class="nav-text">TODO</span></a></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#预览插件"><span class="nav-number">1.</span> <span class="nav-text">预览插件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图片插件"><span class="nav-number">2.</span> <span class="nav-text">图片插件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#七牛云图床使用"><span class="nav-number">2.1.</span> <span class="nav-text">七牛云图床使用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#博客框架"><span class="nav-number"></span> <span class="nav-text">博客框架</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#截图软件"><span class="nav-number"></span> <span class="nav-text">截图软件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#工作流"><span class="nav-number"></span> <span class="nav-text">工作流</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#TODO"><span class="nav-number"></span> <span class="nav-text">TODO</span></a></div>
             
 
           </div>
@@ -701,6 +712,8 @@
   
 
   
+  
+
 
   
 

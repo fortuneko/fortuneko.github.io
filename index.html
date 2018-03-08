@@ -260,7 +260,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/02/caffe使用示例/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/02/caffe数据库操作/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Fortune Ko">
@@ -279,7 +279,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/03/02/caffe使用示例/" itemprop="url">caffe使用示例</a></h1>
+                <a class="post-title-link" href="/2018/03/02/caffe数据库操作/" itemprop="url">caffe数据库操作</a></h1>
         
 
         <div class="post-meta">
@@ -291,7 +291,7 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-02T09:34:31+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-02T12:05:31-05:00">
                 2018-03-02
               </time>
             
@@ -307,8 +307,8 @@
               
                 <span class="post-meta-item-text">Post modified</span>
               
-              <time title="Post modified" itemprop="dateModified" datetime="2018-03-02T09:59:34+08:00">
-                2018-03-02
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-08T03:21:37-05:00">
+                2018-03-08
               </time>
             
           </span>
@@ -343,46 +343,167 @@
       
         
           
-            <p>caffe编译完成之后，会在编译输出的目录下生成如下文件：</p>
-<ul>
-<li>tools文件夹中生成各种可执行程序<br>主要有caffe、compute_image_mean、convert_imageset</li>
-<li>lib文件中生成caffe库</li>
-</ul>
-<p>使用编译好的程序可以完成模型训练与测试，使用的流程包括如下几个过程：</p>
-<ul>
-<li>训练数据准备</li>
-<li>配置文件准备</li>
-<li>启动训练</li>
-<li>测试模型</li>
-</ul>
-<h2 id="训练数据准备"><a href="#训练数据准备" class="headerlink" title="训练数据准备"></a>训练数据准备</h2><p>caffe训练使用的数据是存放在数据库中的，而原始的训练数据则是一系列的图片和对应的标注信息，所以在训练前需要将训练数据准换成数据库形式的，数据库中每一条记录的键值对为：</p>
-<ul>
-<li>键为样本信息列表文件中的行号+图像名称<br>这可以使得所有样本在数据库中的键唯一</li>
-<li>值为样本数据<br>样本数据被存放在Datum结构体中，然后再将该结构体序列化为string类型对象，将该对象存放为值</li>
-</ul>
-<p>caffe工程中提供了一个名为convert_imageset.cpp实现该过程，以mnist为例，原始的数据集的文件组织结构如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── test</span><br><span class="line">│   ├── 0</span><br><span class="line">│   ├── 1</span><br><span class="line">│   ├── 2</span><br><span class="line">│   ├── 3</span><br><span class="line">│   ├── 4</span><br><span class="line">│   ├── 5</span><br><span class="line">│   ├── 6</span><br><span class="line">│   ├── 7</span><br><span class="line">│   ├── 8</span><br><span class="line">│   ├── 9</span><br><span class="line">│   ├── labels.txt</span><br><span class="line">│   └── test.txt</span><br><span class="line">└── train</span><br><span class="line">    ├── 0</span><br><span class="line">    ├── 1</span><br><span class="line">    ├── 2</span><br><span class="line">    ├── 3</span><br><span class="line">    ├── 4</span><br><span class="line">    ├── 5</span><br><span class="line">    ├── 6</span><br><span class="line">    ├── 7</span><br><span class="line">    ├── 8</span><br><span class="line">    ├── 9</span><br><span class="line">    ├── labels.txt</span><br><span class="line">    └── train.txt</span><br></pre></td></tr></table></figure></p>
-<p>上面包含了两个数据集，分别为训练集和测试集，数据集中的每个子文件夹分别对应每个手写数据的图像，labels.txt中存放了该数据集的类别，这里总共10类，train.txt和test.txt中记录了各自数据集中每条样本数据的信息，内容示例如下：  </p>
-<blockquote>
-<p>mnist/train/5/00000.png 5<br>mnist/train/0/00001.png 0</p>
-</blockquote>
-<p>上面中每一行对应每张图片和它所属的标签，通过该列表以及mnist所在的目录就可以访问到该数据集中的每个样本信息了，convert_imageset转换示例的shell命令如下：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">DATA=/home/ko/dataset</span><br><span class="line">rm -rf <span class="variable">$DATA</span>/img_train_lmdb</span><br><span class="line"><span class="built_in">cd</span> /home/ko/code/caffe/tools</span><br><span class="line">./convert_imageset --shuffle --resize_height=28 --resize_width=28 <span class="variable">$DATA</span>/ <span class="variable">$DATA</span>/mnist/train/train.txt <span class="variable">$DATA</span>/img_train_lmdb</span><br></pre></td></tr></table></figure></p>
-<p>这里将训练集中的图像和标签写入到数据库img_train_lmdb/data.mdb中。从这里可以看出，数据集的文件结构组织并不需要按照特别的格式，只需要通过对应的样本列表文件train.txt可以访问到每一条样本信息即可</p>
-<h2 id="配置文件准备"><a href="#配置文件准备" class="headerlink" title="配置文件准备"></a>配置文件准备</h2><p>caffe的训练需要指定训练数据、训练使用的网络以及一些训练的初始参数，这些参数都被存放在一个xxx_solver.prototxt文件中，以minst例子为例，它使用的网络是lenet，对应的网络文件为lenet_solver.prototxt，它的内容如下：<br><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 训练和测试所使用的网络定义文件</span></span><br><span class="line"><span class="symbol">net:</span> <span class="string">"/home/ko/dataset/lenet_train_test.prototxt"</span></span><br><span class="line"><span class="comment"># test_iter specifies how many forward passes the test should carry out.</span></span><br><span class="line"><span class="comment"># In the case of MNIST, we have test batch size 100 and 100 test iterations,</span></span><br><span class="line"><span class="comment"># covering the full 10,000 testing images.</span></span><br><span class="line"><span class="symbol">test_iter:</span> <span class="number">100</span></span><br><span class="line"><span class="comment"># Carry out testing every 500 training iterations.</span></span><br><span class="line"><span class="symbol">test_interval:</span> <span class="number">500</span></span><br><span class="line"><span class="comment"># The base learning rate, momentum and the weight decay of the network.</span></span><br><span class="line"><span class="symbol">base_lr:</span> <span class="number">0</span>.<span class="number">01</span></span><br><span class="line"><span class="symbol">momentum:</span> <span class="number">0</span>.<span class="number">9</span></span><br><span class="line"><span class="symbol">weight_decay:</span> <span class="number">0</span>.<span class="number">0005</span></span><br><span class="line"><span class="comment"># The learning rate policy</span></span><br><span class="line"><span class="symbol">lr_policy:</span> <span class="string">"inv"</span></span><br><span class="line"><span class="symbol">gamma:</span> <span class="number">0</span>.<span class="number">0001</span></span><br><span class="line"><span class="symbol">power:</span> <span class="number">0</span>.<span class="number">75</span></span><br><span class="line"><span class="comment"># Display every 100 iterations</span></span><br><span class="line"><span class="symbol">display:</span> <span class="number">100</span></span><br><span class="line"><span class="comment"># The maximum number of iterations</span></span><br><span class="line"><span class="symbol">max_iter:</span> <span class="number">10000</span></span><br><span class="line"><span class="comment"># snapshot intermediate results</span></span><br><span class="line"><span class="symbol">snapshot:</span> <span class="number">5000</span></span><br><span class="line"><span class="symbol">snapshot_prefix:</span> <span class="string">"lenet_x"</span></span><br><span class="line"><span class="comment"># solver mode: CPU or GPU</span></span><br><span class="line"><span class="symbol">solver_mode:</span> CPU</span><br></pre></td></tr></table></figure></p>
-<p>上述文件中定义了训练过程中所使用的 <strong>网络定义文件</strong> 和 <strong>一些超参数</strong>，训练所使用的训练数据存放在网络定义文件中（因为训练数据可以认为是 <strong>神经网络的输入层，也属于网络定义的一部分</strong> ），上述例子中对应的网络文件内容如下:<br><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">name:</span> <span class="string">"LeNet"</span></span><br><span class="line">layer &#123;</span><br><span class="line">  <span class="symbol">name:</span> <span class="string">"mnist"</span></span><br><span class="line">  <span class="symbol">type:</span> <span class="string">"Data"</span></span><br><span class="line">  <span class="symbol">top:</span> <span class="string">"data"</span></span><br><span class="line">  <span class="symbol">top:</span> <span class="string">"label"</span></span><br><span class="line">  <span class="keyword">include</span> &#123;</span><br><span class="line">    <span class="symbol">phase:</span> TRAIN</span><br><span class="line">  &#125;</span><br><span class="line">  transform_param &#123;</span><br><span class="line">    <span class="symbol">scale:</span> <span class="number">0</span>.<span class="number">003</span>90625</span><br><span class="line">  &#125;</span><br><span class="line">  data_param &#123;</span><br><span class="line">    <span class="symbol">source:</span> <span class="string">"/home/ko/dataset/img_train_lmdb"</span></span><br><span class="line">    <span class="symbol">batch_size:</span> <span class="number">64</span></span><br><span class="line">    <span class="symbol">backend:</span> LMDB</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">layer &#123;</span><br><span class="line">  <span class="symbol">name:</span> <span class="string">"mnist"</span></span><br><span class="line">  <span class="symbol">type:</span> <span class="string">"Data"</span></span><br><span class="line">  <span class="symbol">top:</span> <span class="string">"data"</span></span><br><span class="line">  <span class="symbol">top:</span> <span class="string">"label"</span></span><br><span class="line">  <span class="keyword">include</span> &#123;</span><br><span class="line">    <span class="symbol">phase:</span> TEST</span><br><span class="line">  &#125;</span><br><span class="line">  transform_param &#123;</span><br><span class="line">    <span class="symbol">scale:</span> <span class="number">0</span>.<span class="number">003</span>90625</span><br><span class="line">  &#125;</span><br><span class="line">  data_param &#123;</span><br><span class="line">    <span class="symbol">source:</span> <span class="string">"/home/ko/dataset/img_test_lmdb"</span></span><br><span class="line">    <span class="symbol">batch_size:</span> <span class="number">100</span></span><br><span class="line">    <span class="symbol">backend:</span> LMDB</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">#......其他网络层........</span></span><br><span class="line">layer &#123;</span><br><span class="line">  <span class="symbol">name:</span> <span class="string">"accuracy"</span></span><br><span class="line">  <span class="symbol">type:</span> <span class="string">"Accuracy"</span></span><br><span class="line">  <span class="symbol">bottom:</span> <span class="string">"ip2"</span></span><br><span class="line">  <span class="symbol">bottom:</span> <span class="string">"label"</span></span><br><span class="line">  <span class="symbol">top:</span> <span class="string">"accuracy"</span></span><br><span class="line">  <span class="keyword">include</span> &#123;</span><br><span class="line">    <span class="symbol">phase:</span> TEST</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">layer &#123;</span><br><span class="line">  <span class="symbol">name:</span> <span class="string">"loss"</span></span><br><span class="line">  <span class="symbol">type:</span> <span class="string">"SoftmaxWithLoss"</span></span><br><span class="line">  <span class="symbol">bottom:</span> <span class="string">"ip2"</span></span><br><span class="line">  <span class="symbol">bottom:</span> <span class="string">"label"</span></span><br><span class="line">  <span class="symbol">top:</span> <span class="string">"loss"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>从上面可以看出该网络定义文件中分别指定了训练网络和测试网络的数据文件路径，这里是包含训练数据的文件夹，两个文件夹下分别存放了两个data.mdb文件。</p>
-<h2 id="模型训练"><a href="#模型训练" class="headerlink" title="模型训练"></a>模型训练</h2><p>使用编译生成的可执行文件caffe，再结合一些参数可以进行网络的训练，一个训练示例如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./caffe train --solver=/home/ko/dataset/lenet_solver.prototxt</span><br></pre></td></tr></table></figure></p>
-<p>训练完成后，会在可执行程序caffe所在的目录生成对应的模型文件，在训练开始到结束过程中，可能会生成多个训练模型文件，每个模型文件对应迭代的次数，这个由xxx_solver.prototxt中的snapshot参数值决定。例如这里的snapshot为5000，即每迭代500次保存一次训练参数，总共保存了两个：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lenet_x_iter_5000.caffemodel</span><br><span class="line">lenet_x_iter_10000.caffemodel</span><br></pre></td></tr></table></figure></p>
-<h2 id="模型测试"><a href="#模型测试" class="headerlink" title="模型测试"></a>模型测试</h2><p>基于已经训练出来的网络权重，测试网络的精度</p>
-<h3 id="批量测试"><a href="#批量测试" class="headerlink" title="批量测试"></a>批量测试</h3><p>可以使用caffe对已经训练好的模型进行批量测试，批量测试的示例如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./caffe test -model=/home/ko/dataset/lenet_train_test.prototxt -weights=/home/ko/dataset/lenet_x_iter_10000.caffemodel</span><br></pre></td></tr></table></figure></p>
-<p>即使用test命令，同时指定model文件和权重文件，model文件中指定了测试所使用的输入数据</p>
-<h3 id="单张图像测试"><a href="#单张图像测试" class="headerlink" title="单张图像测试"></a>单张图像测试</h3><p>实际中通常是使用已经训练好的网络对单张图像进行测试，需要指定网络和网络权重。由于这里是对单张图片进行识别，所以在网络的第一层需要直接配置好一张图片的维度大小，与训练时的第一层配置不同；同时最后一层输出的是分类概率，而训练的时候最后一层输出的是loss。单张图像测试的网络lenet.prototxt如下：<br><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">name:</span> <span class="string">"LeNet"</span></span><br><span class="line">layer &#123;</span><br><span class="line">  <span class="symbol">name:</span> <span class="string">"data"</span></span><br><span class="line">  <span class="symbol">type:</span> <span class="string">"Input"</span></span><br><span class="line">  <span class="symbol">top:</span> <span class="string">"data"</span></span><br><span class="line">  input_param &#123; <span class="symbol">shape:</span> &#123; <span class="symbol">dim:</span> <span class="number">1</span> <span class="symbol">dim:</span> <span class="number">3</span> <span class="symbol">dim:</span> <span class="number">28</span> <span class="symbol">dim:</span> <span class="number">28</span> &#125; &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">#....其他层....</span></span><br><span class="line">layer &#123;</span><br><span class="line">  <span class="symbol">name:</span> <span class="string">"prob"</span></span><br><span class="line">  <span class="symbol">type:</span> <span class="string">"Softmax"</span></span><br><span class="line">  <span class="symbol">bottom:</span> <span class="string">"ip2"</span></span><br><span class="line">  <span class="symbol">top:</span> <span class="string">"prob"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这里第一层输入层的维度为1<em>3</em>28*28，表示3个通道的28x28大小的图像，这里与minst示例默认的不同，是因为我在转换训练数据的时候（使用convert_imageset）没有加上–gray参数使得转换后的数据是3通道的，既然训练数据是3通道的，那么测试时输入数据显然也必须是3通道的，测试的代码如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;opencv2/opencv.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;caffe/caffe.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> caffe;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc,<span class="keyword">char</span>* argv[])</span> </span>&#123;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">float</span> type;</span><br><span class="line">    type ary[<span class="number">28</span>*<span class="number">28</span>*<span class="number">3</span>];</span><br><span class="line">    <span class="comment">//和训练数据集一样，白底黑字</span></span><br><span class="line">    cv::Mat gray(28,28,CV_8UC1,cv::Scalar(255));</span><br><span class="line">    cv::putText(gray,argv[<span class="number">3</span>],cv::Point(<span class="number">4</span>,<span class="number">22</span>),<span class="number">5</span>,<span class="number">1.4</span>,cv::Scalar(<span class="number">0</span>),<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">28</span>*<span class="number">28</span>;i++)&#123;</span><br><span class="line">            ary[i] = gray.data[i]/<span class="number">255.0</span>;</span><br><span class="line">            ary[i+<span class="number">28</span>*<span class="number">28</span>] = ary[i];</span><br><span class="line">            ary[i+<span class="number">28</span>*<span class="number">28</span>*<span class="number">2</span>] = ary[i];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    cv::imshow(<span class="string">"x"</span>,gray);</span><br><span class="line">    cv::waitKey();</span><br><span class="line"></span><br><span class="line">    <span class="comment">//set cpu running software</span></span><br><span class="line">    Caffe::set_mode(Caffe::CPU);</span><br><span class="line">    <span class="comment">//load net file , caffe::TEST 用于测试时使用</span></span><br><span class="line">    Net&lt;type&gt; lenet(argv[<span class="number">1</span>],caffe::TEST);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//load net train file caffemodel</span></span><br><span class="line">    lenet.CopyTrainedLayersFrom(argv[<span class="number">2</span>]);</span><br><span class="line"></span><br><span class="line">    Blob&lt;type&gt;* input_ptr = lenet.input_blobs()[<span class="number">0</span>];</span><br><span class="line">    input_ptr-&gt;Reshape(<span class="number">1</span>,<span class="number">3</span>,<span class="number">28</span>,<span class="number">28</span>);</span><br><span class="line"></span><br><span class="line">    Blob&lt;type&gt;* output_ptr= lenet.output_blobs()[<span class="number">0</span>];</span><br><span class="line">    output_ptr-&gt;Reshape(<span class="number">1</span>,<span class="number">10</span>,<span class="number">1</span>,<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//copy data from &lt;ary&gt; to &lt;input_ptr&gt;</span></span><br><span class="line">    input_ptr-&gt;set_cpu_data(ary);</span><br><span class="line">    <span class="comment">//begin once predict</span></span><br><span class="line">    lenet.Forward();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> type* begin = output_ptr-&gt;cpu_data();</span><br><span class="line">    <span class="comment">// get the maximum index</span></span><br><span class="line">    <span class="keyword">int</span> index=<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;<span class="number">10</span>;i++)&#123;</span><br><span class="line">        <span class="keyword">if</span>(begin[index]&lt;begin[i])</span><br><span class="line">        index=i;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打印这次预测[0,9]的每一个置信度</span></span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)</span><br><span class="line">        <span class="built_in">cout</span>&lt;&lt;i&lt;&lt;<span class="string">"\t"</span>&lt;&lt;begin[i]&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 展示最后的预测结果</span></span><br><span class="line">    <span class="built_in">cout</span>&lt;&lt;<span class="string">"res:\t"</span>&lt;&lt;index&lt;&lt;<span class="string">"\t"</span>&lt;&lt;begin[index]&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>将该源代码文件放在src文件夹下，同时为其编写CMakelists.txt，内容如下：<br><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">project(mnist_test)</span><br><span class="line">cmake_minimum_required(VERSION <span class="number">2.8</span>)</span><br><span class="line">add_definitions(-DCPU_ONLY)</span><br><span class="line"><span class="comment">###### libraries #########</span></span><br><span class="line">set(CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125; -g -std=c++11 -fPIC"</span>)</span><br><span class="line">find_package(OpenCV <span class="number">3.3</span> REQUIRED)</span><br><span class="line">include_directories($&#123;OpenCV_INCLUDE_DIRS&#125;)</span><br><span class="line"></span><br><span class="line">include_directories(<span class="regexp">/home/ko</span><span class="regexp">/code/caffe</span><span class="regexp">/include)</span></span><br><span class="line"><span class="regexp">INCLUDE_DIRECTORIES(/home</span><span class="regexp">/ko/code</span><span class="regexp">/build-caffe-Desktop_Qt_5_9_1_GCC_64bit-Debug/include</span>)</span><br><span class="line"></span><br><span class="line">LINK_DIRECTORIES(<span class="regexp">/home/ko</span><span class="regexp">/code/build</span>-caffe-Desktop_Qt_5_9_1_GCC_64bit-Debug/lib)</span><br><span class="line">find_package(Boost <span class="number">1.54</span> REQUIRED COMPONENTS system thread filesystem)</span><br><span class="line">include_directories($&#123;Boost_INCLUDE_DIRS&#125;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">aux_source_directory($&#123;CMAKE_CURRENT_SOURCE_DIR&#125;/src LOCAL_SRC_LIST)</span><br><span class="line">include_directories($&#123;CMAKE_CURRENT_SOURCE_DIR&#125;/<span class="keyword">include</span>)</span><br><span class="line"></span><br><span class="line">add_executable(mytest $&#123;LOCAL_SRC_LIST&#125;)</span><br><span class="line">target_link_libraries(mnist_test $&#123;OpenCV_LIBS&#125; $&#123;Boost_LIBRARIES&#125; glog caffe-d pthread)</span><br></pre></td></tr></table></figure></p>
-<p>编译完成后，执行如下命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./mnist_test /home/ko/dataset/lenet.prototxt  /home/ko/dataset/lenet_x_iter_10000.caffemodel  3</span><br></pre></td></tr></table></figure></p>
-<p>上面最后一个参数为用于测试识别的数字，程序中会将该数字绘制到图像中心用于识别，运行可以得到输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">0	1.68687e-09</span><br><span class="line">1	2.40135e-07</span><br><span class="line">2	1.28962e-06</span><br><span class="line">3	0.99998</span><br><span class="line">4	5.82972e-08</span><br><span class="line">5	5.08502e-06</span><br><span class="line">6	1.35832e-10</span><br><span class="line">7	1.38797e-07</span><br><span class="line">8	1.16004e-05</span><br><span class="line">9	1.96567e-06</span><br><span class="line">res:	3	0.99998</span><br></pre></td></tr></table></figure></p>
-<p>从这里看出识别正确，且置信度很高</p>
+          caffe默认使用lmdb类型数据库，这里简单记录读和写的操作  
+数据库读取分如下几步：  
+
+打开数据库
+获取数据库中键值对迭代器
+使用迭代器遍历数据库
+
+示例代码如下：123456789scoped_ptr&lt;db::DB&gt; db(db::GetDB(FLAGS_backend));
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/03/02/caffe数据库操作/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/02/caffe使用示例/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Fortune Ko">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fortune Ko">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/02/caffe使用示例/" itemprop="url">caffe使用示例</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-02T09:34:31-05:00">
+                2018-03-02
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Post modified</span>
+              
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-08T03:21:37-05:00">
+                2018-03-08
+              </time>
+            
+          </span>
 
           
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          caffe编译完成之后，会在编译输出的目录下生成如下文件：
+
+tools文件夹中生成各种可执行程序主要有caffe、compute_image_mean、convert_imageset
+lib文件中生成caffe库
+
+使用编译好的程序可以完成模型训练与测试，使用的流程包括如下几个过程：
+
+训练数据
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/03/02/caffe使用示例/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -460,7 +581,7 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-01T20:30:30+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-01T20:30:30-05:00">
                 2018-03-01
               </time>
             
@@ -476,8 +597,8 @@
               
                 <span class="post-meta-item-text">Post modified</span>
               
-              <time title="Post modified" itemprop="dateModified" datetime="2018-03-02T11:14:14+08:00">
-                2018-03-02
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-08T03:29:57-05:00">
+                2018-03-08
               </time>
             
           </span>
@@ -512,29 +633,16 @@
       
         
           
-            <p>#Atom编辑器<br>使用atom作为写作编辑器，按照网上的教程进行安装，安装完成后再安装一些需要用的插件，到菜单 <strong>编辑|preference</strong> 下点开配置界面，然后到 <strong>扩展</strong> 页面可以看到已经安装好的插件，到 <strong>安装</strong> 页面可以根据名称在线安装特定插件。平时常用的插件有如下一些：  </p>
-<h2 id="预览插件"><a href="#预览插件" class="headerlink" title="预览插件"></a>预览插件</h2><p>名为markdown-preview-enchaned，该插件除了可以对markdown语法支持外，还可以很好的支持数学公式，以及流程图，同时可以将文章导出成多种格式的文件。</p>
-<h2 id="图片插件"><a href="#图片插件" class="headerlink" title="图片插件"></a>图片插件</h2><p>使用markdown-img-paste插件，支持将图片粘贴到文章中，内部的操作是将剪贴板中的图像内容拷贝到一个指定位置，然后再插入该图片的链接地址，图片的存放位置可以有：</p>
-<ul>
-<li>本地文件夹<br>会在该文章的文件夹中新建一个名为asset的文件夹，图片被存放到该文件夹中</li>
-<li>网络空间<br>可以将图像上传到网络空间（通常称为图床），然后再引用网络空间中的图像，这样以后发布文章的时候就不需要再发布图像了，因为图像已经处于网络上可以被任意访问了</li>
-</ul>
-<p>通常情况下，最好同时勾选本地文件夹和一个网络空间，假如图床挂了，还可以方便的再从本地文件夹中找回图像（本地的图像也上传到github管理）</p>
-<h3 id="七牛云图床使用"><a href="#七牛云图床使用" class="headerlink" title="七牛云图床使用"></a>七牛云图床使用</h3><p>按网站要求完成各种验证，验证完之后到对象存储栏目创建一个存储仓库（bucket），然后在到markdown-img-paste插件配置面板进行如下配置：</p>
-<ul>
-<li>勾选use qiniu for image link</li>
-<li>配置公钥和私钥<br>公钥和私钥在七牛云的个人面板-&gt;秘钥管理里面找到</li>
-<li>bucket名称写前面创建的存储仓库名称</li>
-<li>domain填写上传图像后公共链接除图像名称的前半部分<br>例如假如上传的图像的公共链接是<a href="http://xxxx/image1.png，那么这里domain的内容则是http://xxxx" target="_blank" rel="noopener">http://xxxx/image1.png，那么这里domain的内容则是http://xxxx</a></li>
-<li>Uphost<br>填写图像的上传地址，使用默认值时会出错，错误消息里会提示应该使用的地址，当前使用的是<a href="http://up-z2.qiniu.com" target="_blank" rel="noopener">http://up-z2.qiniu.com</a></li>
-</ul>
-<h1 id="截图软件"><a href="#截图软件" class="headerlink" title="截图软件"></a>截图软件</h1><p>linux中的截图软件可以使用deepin-scrot，安装完成后到 system-&gt;keyboard-&gt;shortcut添加一个快捷键CTRL+ALT+W，内容是deepin-scrot，这样就可以使用快捷键CTRL+ALT+W来启动截图工具了</p>
-<h1 id="工作流"><a href="#工作流" class="headerlink" title="工作流"></a>工作流</h1><p>当前的工作目录如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── fortuneko.github.io</span><br><span class="line">└── hexo</span><br><span class="line">    ├── node_modules  </span><br><span class="line">    ├── public</span><br><span class="line">    ├── scaffolds</span><br><span class="line">    ├── source</span><br><span class="line">    │   ├── _drafts</span><br><span class="line">    │   └── _posts</span><br><span class="line">    └── themes</span><br><span class="line">        ├── landscape</span><br><span class="line">        └── next</span><br></pre></td></tr></table></figure></p>
-<p>fortuneko.github.io为博客的发布仓库文件夹，hexo为博客系统文件夹，其中source文件夹存放写作的文章。写作过程中使用Atom添加hexo/source为项目文件夹，先写草稿将其存放在_drafts中，写好之后直接将其拖到_posts文件夹中，然后再执行一次编译发布。</p>
-<h1 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h1><p>完成上述的环境配置后基本可以开始写作了，后面有时间需要进一步完善的有：<br><strong>图像压缩</strong><br>图片插件在粘贴的时候默认将剪贴板中的截图内容存成png格式，使用图床的话比较浪费流量（七牛云免费每个月只有1G），所以假如可以将截图的内容存成jpg格式的话，可以节省不少流量</p>
-<p><strong>主题优化</strong><br>当期的主题没有类别栏目，没有大纲视图，在主页把所有文章都展开出来，阅读体验比较差</p>
-
-          
+          #Atom编辑器使用atom作为写作编辑器，按照网上的教程进行安装，安装完成后再安装一些需要用的插件，到菜单 编辑|preference 下点开配置界面，然后到 扩展 页面可以看到已经安装好的插件，到 安装 页面可以根据名称在线安装特定插件。平时常用的插件有如下一些：  
+预览插件名为markdow
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/03/01/写作环境搭建/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -612,7 +720,7 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-01T10:43:48+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-01T10:43:48-05:00">
                 2018-03-01
               </time>
             
@@ -628,8 +736,8 @@
               
                 <span class="post-meta-item-text">Post modified</span>
               
-              <time title="Post modified" itemprop="dateModified" datetime="2018-03-01T10:44:11+08:00">
-                2018-03-01
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-08T03:21:37-05:00">
+                2018-03-08
               </time>
             
           </span>
@@ -664,48 +772,15 @@
       
         
           
-            <p>cmake通过组织某些特定的源文件构建不同的编译目标（编译目标可以是库、可执行文件），同时某些编译目标可以依赖于其他的一些编译目标输出，最后所有的编译目标一起构建成一个工程。使用cmake完成的工程构建后，cmake会为工程生成对应的makefile文件，后面直接基于生成的makefile文件调用make就可以了。<br>构建cmake工程的过程主要是为不同的编译目标编写编写好CMakeLists.txt，然后最后使用一个工程对应编写的CMakeLists.txt将所有的子编译目标组织起来。简单的cmake工程可以不设置子编译目标。</p>
-<p>一个简单的工作流程：<br>1）创建项目目录，准备好代码<br>2）编写好CMakeLists.txt文件<br>2）mkdir build, cd build, cmake ..，自动生成编译所需的文件，包括CmakeFiles,CmakeCache.txt,cmake_install.cmake,以及makefile。这里cmake后面的参数为编写CMakeLists文件所在的目录，这种编译方式是源代码和编译输出不在同一个目录里，为out of place的编译方式，而假如编译输出和源代码在同一个目录，则成为in place编译方式。<br>3）make，完成编译</p>
-<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p>基于cmake有两种不同的编译方式，一种称为in-place编译，另一种为out-of-place编译，前一种是编译的输出与源文件工程目录同处一个目录，而后者则是编译输出与源文件处于不同的目录。</p>
-<p>在源码目录外构建（不是在源码目录里面）一个helloworld工程</p>
-<p>1）mkdir test , cd test<br>2）mkdir src ,cd src , vim main.c<br>3）在src目录里，编写CmakeLists.txt，内容如下：<br>ADD_EXECUTABLE(hello main.c)<br>4）在test目录里，编写CmakeLists.txt，内容如下：<br>    PROJECT(HELLO)<br>ADD_SUBDIRECTORY(src bin)<br>5）mkdir build, cd build,cmake .. ,make</p>
-<p>这里面，ADD_EXECUTABLE是用来创建一个项目的，这里创建的是可执行项目，再后面新建了一个HELLO的工程，在该工程中添加了上面创建的项目所在的目录，并将该项目输出目录指定为bin。到此，在build/bin目录里生成了hello可执行文件</p>
-<h2 id="语法规则"><a href="#语法规则" class="headerlink" title="语法规则"></a>语法规则</h2><p>cmake里的指令和函数都不区分大小写，但是变量名区分大小写</p>
-<h3 id="常规变量引用"><a href="#常规变量引用" class="headerlink" title="常规变量引用"></a>常规变量引用</h3><p>使用\${变量名}对变量进行引用，但是如下几个场合直接使用变量名：  </p>
-<ul>
-<li>IF控制语句中</li>
-<li>用SET初始化变量的时候</li>
-</ul>
-<p>示例：MESSAGE(STATUS “This is BINARY dir “ \${PROJECT_BINARY_DIR})<br>说明：变量引用也可以放在字符串中，如上面也可以写成MESSAGE(STATUS “This is BINARY dir ${PROJECT_BINARY_DIR}”)</p>
-<h3 id="环境变量引用"><a href="#环境变量引用" class="headerlink" title="环境变量引用"></a>环境变量引用</h3><p>对于系统的环境变量，可以使用\$ENV{环境变量名}的格式进行引用，例如linux下引用用户根目录使用$ENV{HOME}</p>
-<h3 id="指令调用"><a href="#指令调用" class="headerlink" title="指令调用"></a>指令调用</h3><p>语法：指令（参数1 参数2 ….） 或者 指令（参数1;参数2 ;….）<br>说明：参数之间用 <strong>空格或者分号</strong> 隔开<br>指令的参数中，有一些是用中括号[]包含的，它指明该参数是可选的</p>
-<h2 id="cmake基本指令"><a href="#cmake基本指令" class="headerlink" title="cmake基本指令"></a>cmake基本指令</h2><p>cmake中包含了一系列的指令，编写CMakeLists.txt的过程就是用这些指令来完成某些特定的任务。cmake指令不区分大小写</p>
-<h3 id="PROJECT"><a href="#PROJECT" class="headerlink" title="PROJECT"></a>PROJECT</h3><p>语法：PROJECT(projectname [CXX] [C] [Java])<br>说明：用该指令来定义工程名，并可指定该工程支持的语言，不指定支持语言列表时，表示支持所有语言<br>注：</p>
-<blockquote>
-<p>该指令隐式定义了两个cmake变量，\<projectname>_BINARY_DIR 和 \<projectname>_SOURCE_DIR，在上面示例中，对应的两个变量是HELLO_BINARY_DIR和HELLO_SOURCE_DIR。同时，cmake中也预定义了PROJECT_BINARY_DIR和PROJECT_SOURCE_DIR变量，它们的值与PROJECT隐式定义的两个变量一致，后面实际应用中推荐使用PROJECT_BINARY_DIR和PROJECT_SOURCE_DIR，因为它们不会受到项目名称改变的影响。而假如将工程名HELLO改为了WORLD，则项目中用到的HELLO_BINARY_DIR就需要手动改为WORLD_BINARY_DIR</projectname></projectname></p>
-</blockquote>
-<h3 id="SET"><a href="#SET" class="headerlink" title="SET"></a>SET</h3><p>语法：SET(VAR [VALUE] [CACHE TYPE DOCSTRING [FORCE]])<br>说明：定义cmake变量<br>示例：上面例子中，SET(SRC_LIST main.c)，VALUE也可以是多个值，SET(SRC_LIST main.c a.c)<br>在指定变量的时候，一般来说，变量的值对应的都是字符串，但是可以不用使用””，如上面的main.c可以写成”main.c”，也可以不用””</p>
-<h3 id="message"><a href="#message" class="headerlink" title="message"></a>message</h3><p>语法：message([SEND_ERROR | STATUS | FATAL_ERROR] “message to display” …)<br>说明：用于在构建工程中输出消息，第一个参数用于指定消息的类型，消息为SEND_ERROR时会弹出窗口，STATUS会在消息前加上符号“-”，FATAL_ERROR为失败消息，输出完消息后cmake构建过程终止。后面的消息可以由多个要输出的消息连接而成，使用 <strong>空格符号</strong> 作为连接符号<br>使用示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">message(STATUS &quot;current fold is:&quot; PROJECT_SOURCE_DIR)</span><br></pre></td></tr></table></figure></p>
-<h3 id="add-executable"><a href="#add-executable" class="headerlink" title="add_executable"></a>add_executable</h3><p>语法：add_executable(<name>  [WIN32] [MACOSX_BUNDLE] [EXCLUDE_FROM_ALL]  source1 [source2 …])<br>说明：输出一个可执行文件，该可执行文件是基于某些源文件编译而来的，源文件由源文件列表指定，即为source1 [source2 …]，该操作相当于创建一个输出可执行文件的项目</name></p>
-<h3 id="add-library"><a href="#add-library" class="headerlink" title="add_library"></a>add_library</h3><p>语法：add_library(<name> [STATIC | SHARED | MODULE]         [EXCLUDE_FROM_ALL] source1 [source2 …])<br>说明：输出一个库文件，第一个参数为库名称，第二个参数指定库的生成方式（未指定的话默认是STATIC），EXCLUDE_FROM_ALL指明将该编译目标从所有编译目标中排除，后面的source指定源文件路径 多个的话通过空格分开</name></p>
-<p><strong>EXCLUDE_FROM_ALL</strong> 的用法<br>有的时候在编译release版本的时候，为了加快编译速度需要把测试相关的编译目标关掉，这个时候就可以为测试相关的编译目标增加EXCLUDE_FROM_ALL修饰符，如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">add_library(cmimpl SHARED $&#123;CMIMPL_SOURCE_FILES&#125;)</span><br><span class="line">add_library(cmjnidrv SHARED $&#123;JNI_SOURCE_FILES&#125;)</span><br><span class="line"># fctest指定了EXCLUDE_FROM_ALL 属性,不会自动编译，只能手动编译</span><br><span class="line">add_executable(fctest EXCLUDE_FROM_ALL FeatureCompareSpeedTest.cpp</span><br></pre></td></tr></table></figure></p>
-<p>此时假如需要编译fctest的话，可以手动进行编译，使用make fctest命令。</p>
-<h3 id="add-subdirectory"><a href="#add-subdirectory" class="headerlink" title="add_subdirectory"></a>add_subdirectory</h3><p>语法：add_subdirectory(source_dir [binary_dir] [EXCLUDE_FROM_ALL])<br>说明：从source_dir目录里搜索CMakeLists.txt，将其指定的项目添加到当前工程，同时用binary_dir来指定添加的工程输出中间二进制和目标二进制的存放位置。EXCLUDE_FROM_ALL参数是将该目录从编译过程中排除，例如example目录需要在基本库编译完成后，再进入example目录单独构建</p>
-<h2 id="预定义变量"><a href="#预定义变量" class="headerlink" title="预定义变量"></a>预定义变量</h2><p>cmake中会自带一些预定义变量，这些变量都有默认值，假如熟悉它们的默认值，可以直接使用，否则可以先对这些变量先用SET指定值，然后后面再使用。cmake中自带的一些变量和编译采用的方式有关，有out of place和 in place两种方式，out of place是源代码目录和编译输出目录不在同一个位置，in place则是源代码和编译输出目录在同一个目录</p>
-<h3 id="PROJECT-BINARY-DIR"><a href="#PROJECT-BINARY-DIR" class="headerlink" title="PROJECT_BINARY_DIR"></a>PROJECT_BINARY_DIR</h3><p>编译输出目录，假如是out of place的编译方式，则其对应指定的输出目录，否则就为工程对应的为CMakeLists.txt所在的目录。<br>例如在编译opencv的时候，通常是mkdir build,cd build,cmake ..，这里PROJECT_BINARY_DIR对应的就是build文件夹</p>
-<h3 id="PROJECT-SOURCE-DIR"><a href="#PROJECT-SOURCE-DIR" class="headerlink" title="PROJECT_SOURCE_DIR"></a>PROJECT_SOURCE_DIR</h3><p>为工程对应的为CMakeLists.txt所在的目录</p>
-<h3 id="CMAKE-MODULE-PATH"><a href="#CMAKE-MODULE-PATH" class="headerlink" title="CMAKE_MODULE_PATH"></a>CMAKE_MODULE_PATH</h3><p>CMAKE模块所在的路径，假如工程中编写了.cmake文件，为了让cmake编译系统找到这些文件就需要指定这些文件所在的路径，例如<br>SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)，然后就可以通过INCLUDE来调用.cmake文件中定义的函数了</p>
-<h2 id="编译选项"><a href="#编译选项" class="headerlink" title="编译选项"></a>编译选项</h2><p>CMAKE_CXX_FLAGS和CMAKE_C_FLAGS，分别为c++和c编译选项，通过设置它们量内容可以为工程增加一些编译选项，例如增加c++11支持的话可以使用如下操作<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SET(CMAKE_CXX_FLAGS &quot;$&#123;CMAKE_CXX_FLAGS&#125; -g -std=c++11&quot;)</span><br></pre></td></tr></table></figure></p>
-<p>这里是对原来的编译选项增加新的选项，所以SET对应的值是原来的变量后面再连接新增的值</p>
-<h2 id="构建工程"><a href="#构建工程" class="headerlink" title="构建工程"></a>构建工程</h2><p>构建工程可以有不同的构建方式，这里暂且将它们分为有编译子目标和无编译子目标两种构建方式。  </p>
-<ul>
-<li>有编译子目标<br>将不同部分拆分成不同的子编译目标，最后使用一个CMakeLists.txt将这些子编译目标组织起来，这种构建方式需要为每个子编译目标都编写一个CMakeLists.txt，这种方式属于业界标准的构建方式，像opencv、caffe等一些比较优秀的项目都使用这种构建方式</li>
-<li>无编译子目标<br>这种构建方式通常用于代码量小的工程，整个工程仅有一个编写CMakeLists.txt文件，所有的cmake实现都写在该文件中</li>
-</ul>
-<p>构建cmake工程有一定基本的样式，下面是一个简单的示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">project(testProj)</span><br><span class="line">cmake_minimum_required(VERSION 2.8)</span><br><span class="line"></span><br><span class="line">set(CMAKE_CXX_FLAGS &quot;$&#123;CMAKE_CXX_FLAGS&#125; -g -std=c++11 -fPIC&quot;)</span><br><span class="line">set(CMAKE_C_FLAGS &quot;$&#123;CMAKE_C_FLAGS&#125; -Wall -std=gnu99 -Wno-unknown-pragmas -g -fpermissive&quot;)</span><br><span class="line">aux_source_directory($&#123;PROJECT_SOURCE_DIR&#125;/src LOCAL_SRC_LIST)</span><br><span class="line">include_directories($&#123;PROJECT_SOURCE_DIR&#125;)</span><br><span class="line"></span><br><span class="line">find_package(OpenCV 3.3 REQUIRED)</span><br><span class="line">include_directories($&#123;OpenCV_INCLUDE_DIRS&#125;)</span><br><span class="line"></span><br><span class="line">add_executable(test $&#123;LOCAL_SRC_LIST&#125;)</span><br><span class="line">target_link_libraries(test $&#123;OpenCV_LIBS&#125; )</span><br></pre></td></tr></table></figure></p>
-<p>这里的示例没有构建子编译目标，而是直接构建了一个可执行文件工程。</p>
-
-          
+          cmake通过组织某些特定的源文件构建不同的编译目标（编译目标可以是库、可执行文件），同时某些编译目标可以依赖于其他的一些编译目标输出，最后所有的编译目标一起构建成一个工程。使用cmake完成的工程构建后，cmake会为工程生成对应的makefile文件，后面直接基于生成的makefile文件调用m
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/03/01/cmake基础/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -783,7 +858,7 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-01T10:42:47+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-01T10:42:47-05:00">
                 2018-03-01
               </time>
             
@@ -799,8 +874,8 @@
               
                 <span class="post-meta-item-text">Post modified</span>
               
-              <time title="Post modified" itemprop="dateModified" datetime="2018-03-01T10:43:19+08:00">
-                2018-03-01
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-08T03:21:37-05:00">
+                2018-03-08
               </time>
             
           </span>
@@ -835,52 +910,18 @@
       
         
           
-            <h2 id="暂存区"><a href="#暂存区" class="headerlink" title="暂存区"></a>暂存区</h2><p>暂存区是指使用git add将文件暂存的空间，暂存的文件可以工作区的文件互相独立，比较暂存区或工作区相关的差异，有如下几种比较方式：  </p>
-<ul>
-<li>git diff –cached，比较暂存区的文件与最新一次提交的差异，即指定–cached参数来表明使用暂存区中的文件</li>
-<li>git diff，比较暂存区和工作区两方的差异</li>
-<li>git diff HEAD，比较工作区和最新一次提交的差异</li>
-</ul>
-<h2 id="提交历史"><a href="#提交历史" class="headerlink" title="提交历史"></a>提交历史</h2><p>基于提交历史进行版本间的比对、查询对于实际的开发跟踪有非常实用的价值，git log结合各种参数可以实现基于提交历史的查询<br>可以实用如下的一些参数来方便的显示、查询对应的提交历史</p>
-<h3 id="补丁形式显示"><a href="#补丁形式显示" class="headerlink" title="补丁形式显示"></a>补丁形式显示</h3><p>使用-p参数可以在显示每条提交历史的时候同时以补丁的形式显示修改的内容，方便查看不同提交之间的更改</p>
-<h3 id="指定时间范围"><a href="#指定时间范围" class="headerlink" title="指定时间范围"></a>指定时间范围</h3><p>假如要查询指定时间范围内的提交记录，可以使用如下参数：</p>
-<ul>
-<li>起始时间：–since或者–after<br>例如git log –since=”2018-02-01”表示查询2018年2月1日之后的提交</li>
-<li>截止时间：–until或者–before</li>
-</ul>
-<h3 id="指定作者"><a href="#指定作者" class="headerlink" title="指定作者"></a>指定作者</h3><p>使用–author=authorname来指定某个特定作者的提交历史</p>
-<h3 id="搜索提交历史消息"><a href="#搜索提交历史消息" class="headerlink" title="搜索提交历史消息"></a>搜索提交历史消息</h3><p>有的时候想要根据某次提交消息的关键字来搜索这次提交，可以使用–grep参数，使用示例如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git log --grep &apos;bug fix&apos;</span><br><span class="line">git log --grep &apos;fix.*bug&apos;</span><br></pre></td></tr></table></figure></p>
-<p>可以直接指定搜索内容或者使用正则表达式进行搜索，在提交历史很多时使用该方式对搜索提交很有帮助</p>
-<h3 id="指定分支"><a href="#指定分支" class="headerlink" title="指定分支"></a>指定分支</h3><p>直接以分支名为参数可以查询某个特定分支的提交历史<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git log branch1</span><br></pre></td></tr></table></figure></p>
-<p>假如要查询所有分支，可以使用如下参数：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git log --branches</span><br><span class="line">git log --all</span><br></pre></td></tr></table></figure></p>
-<p>上一个是查询所有本地分支的提交历史消息，后一个是查询包括所有本地分支、远端分支副本、tag等历史消息</p>
-<h3 id="指定文件"><a href="#指定文件" class="headerlink" title="指定文件"></a>指定文件</h3><p>可以直接指定文件名称或者文件夹路径，查询它们对应的提交历史<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git log fold1/**/file1.cpp</span><br><span class="line">git log source</span><br></pre></td></tr></table></figure></p>
-<h2 id="远程仓库"><a href="#远程仓库" class="headerlink" title="远程仓库"></a>远程仓库</h2><p>远程仓库与本地仓库相对应，远程仓库可以认为是本地仓库的远端存放空间，一个本地仓库可以存放在多个远端空间上，因而一个本地仓库可以对应多个远端仓库。在将本地仓库推送到远端仓库的时候，只需要指定远端仓库名称即可。</p>
-<h3 id="添加远程仓库"><a href="#添加远程仓库" class="headerlink" title="添加远程仓库"></a>添加远程仓库</h3><p>git默认的远端仓库名称为origin，也可以在添加远端仓库的时候指定别的名称，添加远端仓库的操作如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git remote add origin git://github.com/schacon/ticgit.git</span><br><span class="line">git remote add pb git://github.com/paulboone/ticgit.git</span><br></pre></td></tr></table></figure></p>
-<p>上面操作给本地仓库添加了两个远端仓库，一个名为origin，另一个名为pb，使用“仓库名/分支名”的形式来表示远端仓库的分支，而本地分支直接使用分支名表示</p>
-<h3 id="抓取远程仓库"><a href="#抓取远程仓库" class="headerlink" title="抓取远程仓库"></a>抓取远程仓库</h3><p>从远程仓库克隆了某个项目后，项目文件夹中同时会远端仓库分支副本和本地分支，在实际开发过程中，远端仓库经常会发生更新，这个时候需要把远端仓库抓取下来，然后将远端的更新合并到本地分支。通常的做法如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git fetch orgin master;</span><br><span class="line">git diff origin/master</span><br><span class="line">git merge origin/master</span><br></pre></td></tr></table></figure></p>
-<p>第一行将远端仓库的分支抓取下来，这时候在本地的远端仓库副本origin/master就是远端仓库master分支的最新内容，再将本地的分支与该副本进行比对了解有哪些变更，然后再合并到本地分支。<br>从上面可知，git fetch并不会直接将远端仓库的内容合并到本地分支，假如想要直接合并，可以使用pull操作，如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git pull origin master</span><br></pre></td></tr></table></figure></p>
-<p>实际中并不推荐直接合并的形式，因为合并更新前最好先检查一遍更新内容，相当于进行一次代码审阅，防止合并到错误的代码。</p>
-<h3 id="合并其他本地仓库"><a href="#合并其他本地仓库" class="headerlink" title="合并其他本地仓库"></a>合并其他本地仓库</h3><p>远端仓库指的是除了当前本地仓库以外的所有其他仓库，所以除了远程服务器上的仓库外，还可以是本地其他文件夹中的仓库，所以假如要从本地其他路径的仓库合并代码，也可以将其添加为远端仓库，再执行类似的操作<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git remtoe add local_repo /home/ko/test;</span><br><span class="line">git fetech local_repo master;</span><br><span class="line">git diff local_repo/master;</span><br><span class="line">git merge local_repo/master;</span><br></pre></td></tr></table></figure></p>
-<h2 id="分支"><a href="#分支" class="headerlink" title="分支"></a>分支</h2><p>git中的分支实质上是指向某个提交对象（commit）的指针，不同的分支名指向了各自对应的commit，git中HEAD指针来指向最新的一次提交</p>
-<h3 id="提交对象"><a href="#提交对象" class="headerlink" title="提交对象"></a>提交对象</h3><p>git每次新建一个提交对象，会执行如下操作：</p>
-<ul>
-<li>为每个目录创建一个tree对象<br>tree对象含有对应该目录的校验和，同时存放目录中各文件的blob对象的索引</li>
-<li>为每个文件创建blob对象<br>git中文件的快照都是使用blob对象来存储的，每个文件对应一个blob对象，这些blob对象的索引被存放在各目录的tree对象中</li>
-<li>创建commit对象<br>commit对象包含了指向tree对象的指针，以及创建该commit对象的一些元数据，例如提交的作者、时间、消息等<br>提交对象的内容如下图所示：<br><img src="http://p4uum540x.bkt.clouddn.com/markdown-img-paste-2018022818185020.png" alt=""><br>每提交一次，就会新创建一个提交对象，该对象内部有一个parent指针指向它的前一个提交，第一次提交对象的parent为空，常规提交对象的parent仅指向一个父提交对象，合并分支的提交对象的父提交对象可能会有两个（非fast forward合并）,提交后的历史记录如下图：<br><img src="http://p4uum540x.bkt.clouddn.com/markdown-img-paste-20180228182224490.png" alt=""></li>
-</ul>
-<h3 id="操作示例"><a href="#操作示例" class="headerlink" title="操作示例"></a>操作示例</h3><p>一些关于分支的操作示例如下：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git branch branch1;<span class="comment">//基于当前分支创建分支branch1，但是留在当前分支</span></span><br><span class="line">git checkout -b branch1;<span class="comment">//基于当前分支创建分支branch1，并切换到branch1</span></span><br><span class="line">git clone xxxx --single-branch --branch branch1; <span class="comment">//从远端地址仅克隆分支branch1到本地</span></span><br><span class="line">git push orign :branch1; <span class="comment">//在远端仓库中删除分支branch1</span></span><br><span class="line">git push origin branchx:branchy;<span class="comment">//将本地仓库branchx推送到远端仓库的分支branchy</span></span><br></pre></td></tr></table></figure></p>
-<h3 id="分支合并"><a href="#分支合并" class="headerlink" title="分支合并"></a>分支合并</h3><p>分支合并通常有简单的三方合并和分支衍合</p>
-<h4 id="三方合并"><a href="#三方合并" class="headerlink" title="三方合并"></a>三方合并</h4><p>该合并方式将两个分支的模块和它们的共同祖先进行一次三方合并计算，再将合并的结果作为一个新的提交。假设两个分支的共同祖先为A，两个分支的末端提交分别为B和C，三方合并的操作为对于已经跟踪的每个文件，将B和C中对应的版本与A中的版本文件的各个段落（或行）进行比较，操作逻辑如下：</p>
-<ul>
-<li>假如B和C中的内容与A中的内容一致，则该文件不作变更</li>
-<li>假如B中有变更而C中没有，则选取B中的变更到最新的快照中，反之亦然</li>
-<li>假如同一部分B和C都有变更，则会将两者的变更都放到最新的快照中，并将此处标记为冲突</li>
-</ul>
-<h3 id="衍合"><a href="#衍合" class="headerlink" title="衍合"></a>衍合</h3><p>三方合并在频繁使用分支进行开发且分叉众多的时候，这种合并操作很容易使得提交历史树的结构变得繁杂，使用衍合可以使得提交历史基本上都是在主线上一条直线下来，分叉更少。<br>假如当前在develop分支，该分支与master分支存在分叉，现在要将develop上的更新作为补丁的形式应用到master分支，则可以使用衍合，操作如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git rebase master;</span><br></pre></td></tr></table></figure></p>
-<p>此时develop的提交历史直接处于master提交历史的后端了。需要注意的是，假如当前的分支已经发布到了网络公共仓库中，有其他的协作者参与，就不能再对其进行衍合操作，因为这会导致衍合前和衍合后的同一个内容产生更多相同内容的提交历史。<br>衍合的工作流一般是从主分支取出一个特性分支，在本地完成开发后，且主分支更新不多的话，就可以在本地执行好衍合，再推送到远端仓库，开pull request让管理员合并到主分支</p>
+          暂存区暂存区是指使用git add将文件暂存的空间，暂存的文件可以工作区的文件互相独立，比较暂存区或工作区相关的差异，有如下几种比较方式：  
 
-          
+git diff –cached，比较暂存区的文件与最新一次提交的差异，即指定–cached参数来表明使用暂存区中的文件
+git diff，比较暂存区和工
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/03/01/git基础/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -958,7 +999,7 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-25T17:18:46+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-25T17:18:46-05:00">
                 2018-02-25
               </time>
             
@@ -974,8 +1015,8 @@
               
                 <span class="post-meta-item-text">Post modified</span>
               
-              <time title="Post modified" itemprop="dateModified" datetime="2018-02-25T17:19:39+08:00">
-                2018-02-25
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-08T03:21:37-05:00">
+                2018-03-08
               </time>
             
           </span>
@@ -1010,39 +1051,16 @@
       
         
           
-            <p>git中使用.gitignore文件来指定要忽略的文件，.gitignore文件中每一有效行都指定了一种模式，符合该模式的文件或目录会被git忽略。</p>
-<p>假如当前git仓库的文件结构如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── fold_a</span><br><span class="line">│   └── file_a.md</span><br><span class="line">├── fold_b</span><br><span class="line">│   ├── file_b.md</span><br><span class="line">│   └── fold_a</span><br><span class="line">│       └── file_b_a.md</span><br><span class="line">└── fold_c</span><br><span class="line">    └── fold_a #文件</span><br></pre></td></tr></table></figure></p>
-<p>这里以如上的文件结构为示例来说明git的忽略规则</p>
-<h3 id="无效规则"><a href="#无效规则" class="headerlink" title="无效规则"></a>无效规则</h3><p>.gitignore文件中的某些字符不会被git解析为忽略规则：</p>
-<ul>
-<li>空行</li>
-<li>#开头的行（#开头的表示为注释）</li>
-<li>某行后面的空格会被忽略</li>
-</ul>
-<h3 id="忽略目录"><a href="#忽略目录" class="headerlink" title="忽略目录"></a>忽略目录</h3><p>在忽略模式中含有斜杠/，仅仅忽略符合指定规则的目录，而不会忽略同名的文件，假如该例中.gitignore内容写为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fold_a/</span><br></pre></td></tr></table></figure></p>
-<p>此时git reset;git add .;git status的输出为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">new file:   .gitignore</span><br><span class="line">new file:   fold_b/file_b.md</span><br><span class="line">new file:   fold_c/fold_a</span><br></pre></td></tr></table></figure></p>
-<p>可以看出fold_b/fold_a目录及其以下的文件也被忽略</p>
-<h3 id="通配符忽略模式"><a href="#通配符忽略模式" class="headerlink" title="通配符忽略模式"></a>通配符忽略模式</h3><p>假如忽略模式中不含有斜杠，则对应的忽略模式被认为是一个shell通配符，git会根据该通配符来匹配.gitignore文件所在目录以下所有的文件和目录，假如该例中.gitignore内容写为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fold_a</span><br></pre></td></tr></table></figure></p>
-<p>此时git reset;git add .;git status的输出为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">new file:   .gitignore</span><br><span class="line">new file:   fold_b/file_b.md</span><br></pre></td></tr></table></figure></p>
-<p>可以看出名为fold_a的文件和目录都被忽略。</p>
-<h4 id="shell通配符"><a href="#shell通配符" class="headerlink" title="shell通配符"></a>shell通配符</h4><p>官方叫法为shell glob，可以认为是一种简化的正则表达式，它的语法规则如下：</p>
-<ul>
-<li>星号（*）：匹配零个或任意多个字符</li>
-<li>问号（？）：匹配任意一个字符</li>
-<li>[abc]：匹配方括号中的任意一个字符</li>
-<li>[a-z]：短划线表示字符的范围，这里表示匹配a到z中的任意一个字符</li>
-<li>[!] :匹配方括号内字符以外的任意字符，例如[!A]表示匹配除A以外的任意一个字符</li>
-</ul>
-<h3 id="取消或略特定文件"><a href="#取消或略特定文件" class="headerlink" title="取消或略特定文件"></a>取消或略特定文件</h3><p>假如 <strong>前面的</strong> 规则忽略了某些特定的文件，但是又想将其中的某个文件加入git跟踪，可以使用惊叹号！写一条取消忽略的规则，假如该例中.gitignore内容写为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">*.md</span><br><span class="line">!file_b_a.md</span><br></pre></td></tr></table></figure></p>
-<p>此时git reset;git add .;git status的输出为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">new file:   .gitignore</span><br><span class="line">new file:   fold_b/fold_a/file_b_a.md</span><br><span class="line">new file:   fold_c/fold_a</span><br></pre></td></tr></table></figure></p>
-<p>上述的两条规则中第一条将所有的md文件忽略，第二条规则将名为file_b_a.md的文件取消忽略。但是假如取消忽略的文件所在的目录被忽略了，取消忽略该文件的规则就不会生效，假如该例中.gitignore内容更改为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">*.md</span><br><span class="line">fold_a/</span><br><span class="line">!file_b_a.md</span><br></pre></td></tr></table></figure></p>
-<p>此时git reset;git add .;git status的输出如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">new file:   .gitignore</span><br><span class="line">new file:   fold_c/fold_a</span><br></pre></td></tr></table></figure></p>
-<p>file_b_a.md没有被加入跟踪，因为它所在的文件夹fold_a被忽略了。</p>
-<h3 id="双星号（-）字符"><a href="#双星号（-）字符" class="headerlink" title="双星号（** ）字符"></a>双星号（** ）字符</h3><p>两个星号可以表示任意层级的目录，上面讲到的通配符要来指定目录的时候，通常各级的路径都要自己手动指定，但是要表示多级目录无法做到，而双星号可以很方便的表示多级目录。假如该例中.gitignore内容写为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fold_b/**/*.md</span><br></pre></td></tr></table></figure></p>
-<p>此时git reset;git add .;git status的输出为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">new file:   .gitignore</span><br><span class="line">new file:   fold_b/file_b.md</span><br><span class="line">new file:   fold_c/fold_a</span><br></pre></td></tr></table></figure></p>
-<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>在git中，可以在其他地方也使用shell通配符以及双星号来匹配特定的文件或目录，例如在git add，git reset 等等需要指定文件的命令中</p>
-
-          
+          git中使用.gitignore文件来指定要忽略的文件，.gitignore文件中每一有效行都指定了一种模式，符合该模式的文件或目录会被git忽略。
+假如当前git仓库的文件结构如下：123456789.├── fold_a│   └── file_a.md├── fold_b│   ├── fil
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/02/25/git忽略规则/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1120,7 +1138,7 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-11T11:39:27+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-11T11:39:27-05:00">
                 2018-02-11
               </time>
             
@@ -1136,8 +1154,8 @@
               
                 <span class="post-meta-item-text">Post modified</span>
               
-              <time title="Post modified" itemprop="dateModified" datetime="2018-03-01T10:45:58+08:00">
-                2018-03-01
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-08T04:09:20-05:00">
+                2018-03-08
               </time>
             
           </span>
@@ -1172,34 +1190,16 @@
       
         
           
-            <h1 id="hexo博客安装配置"><a href="#hexo博客安装配置" class="headerlink" title="hexo博客安装配置"></a>hexo博客安装配置</h1><h2 id="安装nodejs"><a href="#安装nodejs" class="headerlink" title="安装nodejs"></a>安装nodejs</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install nodejs</span><br><span class="line">sudo apt-get install npm</span><br></pre></td></tr></table></figure>
-<p>安装完nodejs需要将系统两个位置的文件链接，不然会出现这样的错误”/usr/bin/env: ‘node’: No such file or directory”，链接方式如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ln -s /usr/bin/nodejs /usr/bin/node</span><br></pre></td></tr></table></figure></p>
-<h2 id="安装hexo"><a href="#安装hexo" class="headerlink" title="安装hexo"></a>安装hexo</h2><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mkdir hexo;cd hexo</span><br><span class="line">npm install hexo-cli -g</span><br><span class="line">hexo init blog</span><br><span class="line">cd blog</span><br><span class="line">npm install</span><br><span class="line">hexo g <span class="comment"># 或者hexo generate</span></span><br><span class="line">$ hexo s <span class="comment"># 或者hexo server，可以在http://localhost:4000/ 查看</span></span><br></pre></td></tr></table></figure>
-<h2 id="hexo搭建"><a href="#hexo搭建" class="headerlink" title="hexo搭建"></a>hexo搭建</h2><p>hexo框架是将编写的文档编译生成静态的html文件，然后再将这些静态html文件推送到github，和写程序写完之后进行编译再发布类似。详细的教程参见<a href="https://hexo.io/zh-cn/docs/setup.html" target="_blank" rel="noopener">这里</a></p>
-<h3 id="初始化网站"><a href="#初始化网站" class="headerlink" title="初始化网站"></a>初始化网站</h3><p>使用如下命令命令会在当前文件夹下创建一个blog文件夹，同时在该文件夹中生成建站需要的文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo init blog</span><br><span class="line">cd blog</span><br><span class="line">npm install</span><br></pre></td></tr></table></figure></p>
-<h3 id="hexo文件结构"><a href="#hexo文件结构" class="headerlink" title="hexo文件结构"></a>hexo文件结构</h3><p>完成网站的初始化后，会在blog文件中生成如下文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── _config.yml</span><br><span class="line">├── package.json</span><br><span class="line">├── node_modules</span><br><span class="line">├── scaffolds</span><br><span class="line">|   ├── draft.md</span><br><span class="line">|   └── page.md</span><br><span class="line">|   └── post.md</span><br><span class="line">├── source</span><br><span class="line">|   ├── _drafts</span><br><span class="line">|   └── _posts</span><br><span class="line">└── themes</span><br><span class="line">├── public</span><br></pre></td></tr></table></figure></p>
-<p>各文件（夹）存放的内如大致为：  </p>
-<ul>
-<li>_config.yml<br>用于配置hexo的一些全局参数</li>
-<li>package.json<br>用于配置hexo使用的一些js模块</li>
-<li>scaffolds<br>存放文章的模板，写文章的时候有三种类型，对应其中的三个文件名</li>
-<li>source<br>存放自己编写的原始文章，_drafts存放草稿，_posts存放需要发布的文章</li>
-<li>themes<br>存放主题文件夹，下载某个主题会在该文件夹中创建以该主题命名的子文件夹，要切换到某个主题的话，可以在_config.yml中的theme项中指定主题名即可</li>
-<li>public<br>存放hexo编译生成的网站文件，发布的时候就是将该文件夹推送到github仓库   </li>
-</ul>
-<h2 id="github准备"><a href="#github准备" class="headerlink" title="github准备"></a>github准备</h2><p>在github上创建一个名为username.github.io的仓库，username即为自己的用户名。github会对与用户名同名的仓库特别对待，可以用来作为静态的网页空间</p>
-<h1 id="工作流"><a href="#工作流" class="headerlink" title="工作流"></a>工作流</h1><p>完成hexo的配置后，就可以使用hexo来进行博客文章的创建、编译、发布。</p>
-<h2 id="创建文章"><a href="#创建文章" class="headerlink" title="创建文章"></a>创建文章</h2><p>使用如下命令创建新文章<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new [layout] &lt;title&gt;</span><br></pre></td></tr></table></figure></p>
-<p>该命令会在source/_posts目录下创建title.md，该文件在开头部分会有如下的内容：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">title: github博客搭建</span><br><span class="line">date: 2018-02-11 11:39:27</span><br><span class="line">tags: blog</span><br><span class="line">---</span><br></pre></td></tr></table></figure></p>
-<p>也可以手动在上述目录中创建新文章，只需要补全上面格式的内容</p>
-<h2 id="文章编译"><a href="#文章编译" class="headerlink" title="文章编译"></a>文章编译</h2><p>使用如下命令进行所有文章的重新编译:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo clean;</span><br><span class="line">hexo generate</span><br></pre></td></tr></table></figure></p>
-<p>该命令会将原来编译好的public文件夹中的内容清空，同时对source/_posts目录中的文章进行重新编译，编译结果存放到public文件夹</p>
-<h2 id="文章发布"><a href="#文章发布" class="headerlink" title="文章发布"></a>文章发布</h2><p>发布文章到github非常简单，就是将hexo中public文件夹中的所有内容推送到新建的github仓库中。操作示例如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">cd hexo;https://github.com/username/username.github.io.git</span><br><span class="line">cd blog;hexo g;</span><br><span class="line">cp -R public/* ../username.github.io</span><br><span class="line">cd ../username.github.io</span><br><span class="line">git add .</span><br><span class="line">git commit -m &apos;publish posts&apos;</span><br><span class="line">git push origin master</span><br></pre></td></tr></table></figure></p>
-<p>上述操作在hexo文件夹中创建github对应的博客仓库文件夹，然后进入到hexo的博客系统文件夹blog中对当前的文章进行重新编译，然后把public中所有内容拷贝到github仓库，然后提交病推送到github。</p>
-<p>把发布内容推送到github之后，github博客首页需要过几分钟之后才能显示更新的内容</p>
-<h2 id="工作流-1"><a href="#工作流-1" class="headerlink" title="工作流"></a>工作流</h2><p>平时写的文章可能一次写不完，这时候就不需要直接发布到网站上，需要使用另一个仓库来进行版本管理。所以可以使用一个github仓库来管理hexo/blog文件夹，发布的文章则用发布的仓库来进行管理</p>
-
-          
+          hexo博客安装配置安装nodejs12sudo apt-get install nodejssudo apt-get install npm
+上面这种直接安装的nodejs版本太老，假如后面安装的hexo版本较高的话，hexo会不能使用，所以安装时不能直接通过ubuntu的包管理来安装，使用如下安
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/02/11/github博客搭建/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1279,7 +1279,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-count">7</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>
@@ -1291,10 +1291,10 @@
             
             
             <div class="site-state-item site-state-tags">
-              
+              <a href="/tags/index.html">
                 <span class="site-state-item-count">4</span>
                 <span class="site-state-item-name">tags</span>
-              
+              </a>
             </div>
           
 
@@ -1482,6 +1482,28 @@
   
 
   
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
 
   
 

@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="caffe," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="caffe默认使用lmdb类型数据库，这里简单记录读和写的操作   数据库读取分如下几步：    打开数据库 获取数据库中键值对迭代器 使用迭代器遍历数据库  示例代码如下：123456789scoped_ptr&amp;lt;db::DB&amp;gt; db(db::GetDB(FLAGS_backend));db-&amp;gt;Open(argv[1], db::READ);scoped_ptr&amp;lt;db::C">
+<meta name="keywords" content="caffe">
+<meta property="og:type" content="article">
+<meta property="og:title" content="caffe数据库操作">
+<meta property="og:url" content="http://yoursite.com/2018/03/02/caffe数据库操作/index.html">
+<meta property="og:site_name" content="Fortune Ko">
+<meta property="og:description" content="caffe默认使用lmdb类型数据库，这里简单记录读和写的操作   数据库读取分如下几步：    打开数据库 获取数据库中键值对迭代器 使用迭代器遍历数据库  示例代码如下：123456789scoped_ptr&amp;lt;db::DB&amp;gt; db(db::GetDB(FLAGS_backend));db-&amp;gt;Open(argv[1], db::READ);scoped_ptr&amp;lt;db::C">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-03-08T08:21:37.901Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="caffe数据库操作">
+<meta name="twitter:description" content="caffe默认使用lmdb类型数据库，这里简单记录读和写的操作   数据库读取分如下几步：    打开数据库 获取数据库中键值对迭代器 使用迭代器遍历数据库  示例代码如下：123456789scoped_ptr&amp;lt;db::DB&amp;gt; db(db::GetDB(FLAGS_backend));db-&amp;gt;Open(argv[1], db::READ);scoped_ptr&amp;lt;db::C">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/03/02/caffe数据库操作/"/>
+
+
+
+
+
+  <title>caffe数据库操作 | Fortune Ko</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Fortune Ko</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">grow grow up to get internal peace</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/02/caffe数据库操作/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Fortune Ko">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fortune Ko">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">caffe数据库操作</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-02T12:05:31-05:00">
+                2018-03-02
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Post modified</span>
+              
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-08T03:21:37-05:00">
+                2018-03-08
+              </time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>caffe默认使用lmdb类型数据库，这里简单记录读和写的操作  </p>
+<h1 id="数据库读取"><a href="#数据库读取" class="headerlink" title="数据库读取"></a>数据库读取</h1><p>分如下几步：  </p>
+<ul>
+<li>打开数据库</li>
+<li>获取数据库中键值对迭代器</li>
+<li>使用迭代器遍历数据库</li>
+</ul>
+<p>示例代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">scoped_ptr&lt;db::DB&gt; db(db::GetDB(FLAGS_backend));</span><br><span class="line">db-&gt;Open(argv[1], db::READ);</span><br><span class="line">scoped_ptr&lt;db::Cursor&gt; cursor(db-&gt;NewCursor());</span><br><span class="line">while (cursor-&gt;valid()) &#123;</span><br><span class="line">    Datum datum;</span><br><span class="line">    datum.ParseFromString(cursor-&gt;value());</span><br><span class="line">    DecodeDatumNative(&amp;datum);</span><br><span class="line">    cursor-&gt;Next();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面示例代码中，为从迭代器的值项解析出Datum对象，解析完之后根据该值是否有被编码压缩过按需解码，然后滚动迭代器到下一个位置</p>
+<h1 id="数据库写入"><a href="#数据库写入" class="headerlink" title="数据库写入"></a>数据库写入</h1><p>分如下几步：  </p>
+<ul>
+<li>打开数据库</li>
+<li>基于该数据库新建一个事务</li>
+<li>使用新建的事务添加需要写入的数据，此时数据缓存在内存中</li>
+<li>添加的数据达到一定数量后，将其一次性写入到数据库中，同时再新建一个事务继续后续的操作  </li>
+</ul>
+<p>示例代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">// Create new DB</span><br><span class="line">scoped_ptr&lt;db::DB&gt; db(db::GetDB(FLAGS_backend));</span><br><span class="line">db-&gt;Open(argv[3], db::NEW);</span><br><span class="line">scoped_ptr&lt;db::Transaction&gt; txn(db-&gt;NewTransaction());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">for (int line_id = 0; line_id &lt; lines.size(); ++line_id) &#123;</span><br><span class="line">  //read train data to datum</span><br><span class="line">// sequential</span><br><span class="line"> string key_str = caffe::format_int(line_id, 8) + &quot;_&quot; + lines[line_id].first;</span><br><span class="line"></span><br><span class="line"> // Put in db</span><br><span class="line"> string out;</span><br><span class="line"> CHECK(datum.SerializeToString(&amp;out));</span><br><span class="line"> //add data to this transaction</span><br><span class="line"> txn-&gt;Put(key_str, out);</span><br><span class="line"></span><br><span class="line"> if (++count % 1000 == 0) &#123;</span><br><span class="line">   // Commit db</span><br><span class="line">   txn-&gt;Commit();</span><br><span class="line">   txn.reset(db-&gt;NewTransaction());</span><br><span class="line">   LOG(INFO) &lt;&lt; &quot;Processed &quot; &lt;&lt; count &lt;&lt; &quot; files.&quot;;</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br><span class="line">if (count % 1000 != 0) &#123;</span><br><span class="line">    txn-&gt;Commit();</span><br><span class="line">    LOG(INFO) &lt;&lt; &quot;Processed &quot; &lt;&lt; count &lt;&lt; &quot; files.&quot;;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
+<p>从上面可以看出，每个事务对应一次写入，写入完之后需再新建一个事务，添加数据的时候需要指定唯一的键值对  </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/caffe/" rel="tag"># caffe</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/02/caffe使用示例/" rel="next" title="caffe使用示例">
+                <i class="fa fa-chevron-left"></i> caffe使用示例
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Fortune Ko" />
+          <p class="site-author-name" itemprop="name">Fortune Ko</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#数据库读取"><span class="nav-number">1.</span> <span class="nav-text">数据库读取</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据库写入"><span class="nav-number">2.</span> <span class="nav-text">数据库写入</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Fortune Ko</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
